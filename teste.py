@@ -56,7 +56,7 @@ def data_linter(df):
 
 # Execução
 if __name__ == "__main__":
-    caminho = "imdb_fake_movies.csv"  # Certifique-se que o arquivo está no mesmo diretório do script
+    caminho = "data/dados.csv"  # Certifique-se que o arquivo está no mesmo diretório do script
     df_series = ler_arquivo_series(caminho)
 
     if df_series is not None:
