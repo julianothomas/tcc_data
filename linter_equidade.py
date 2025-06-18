@@ -17,4 +17,4 @@ if 'sexo' in df.columns:
         print(f"Coluna 'sexo' com desequilíbrio: {proporcoes.to_dict()}")
         sys.exit(1)
 
-print("Dados validados com sucesso.")
+print("Dados ")
