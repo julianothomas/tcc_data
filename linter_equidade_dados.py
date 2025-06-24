@@ -20,7 +20,7 @@ except Exception as e:
     print(f"Erro ao ler o arquivo CSV: {e}")
     sys.exit(1)
 
-print(f"CSV '{os.path.basename(arquivo)}' carregado com {df.shape[0]} linhas e {df.shape[1]} colunas.\n")
+print(f"Arquivo CSV '{os.path.basename(arquivo)}' carregado com {df.shape[0]} linhas e {df.shape[1]} colunas carregao com sucesso.\n")
 
 # 1. Colunas sem nome
 total_verificacoes += 1
@@ -81,9 +81,17 @@ for col in df.select_dtypes(include=np.number):
     if not outliers.empty:
         erros.append(("outlier", f"Outliers na coluna '{col}': {len(outliers)} com valores irregulares."))
 
+# Porcentagem de erros
+percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
+percentual_corretos = 100 - percentual_erros
+print(f"Total de verificações: {total_verificacoes}")
+print(f"Lints detectados: {len(erros)}")
+print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
+print(f"Porcentagem de dados considerados corretos: {percentual_corretos:.2f}%")
+
 # Resultado
 if erros:
-    print("Problemas encontrados no arquivo:")
+    print("Heurísticas(Lints) encontradas:")
     for categoria, erro in erros:
         print(f"  * [{categoria.upper()}] {erro}")
     print()
@@ -92,10 +100,3 @@ else:
     print("Nenhum erro identificado com as heurísticas aplicadas.\n")
     sys.exit(0)
 
-# Porcentagem de erros
-percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
-percentual_corretos = 100 - percentual_erros
-print(f"Total de verificações: {total_verificacoes}")
-print(f"Lints detectados: {len(erros)}")
-print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
-print(f"Porcentagem de dados considerados corretos: {percentual_corretos:.2f}%")
