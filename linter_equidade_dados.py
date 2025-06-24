@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 # Caminho do arquivo (permite argumento por linha de comando)
-arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_invalidos.csv"
+arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_validos.csv"
 
 # Lista de erros detectados
 erros = []
@@ -87,8 +87,10 @@ if erros:
     for categoria, erro in erros:
         print(f"  * [{categoria.upper()}] {erro}")
     print()
+    sys.exit(1)
 else:
     print("Nenhum erro identificado com as heurísticas aplicadas.\n")
+    sys.exit(0)
 
 # Porcentagem de erros
 percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
