@@ -1,6 +1,6 @@
 Relatório de Verificação - Data Linter
 Arquivo: data/all_disciplines_combined.csv
-Data: 2025-06-24 00:23:40
+Data: 2025-06-24 02:28:50
 Total de verificações: 51
 Lints encontrados: 10
 Porcentagem com erro: 19.61%

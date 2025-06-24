@@ -77,7 +77,7 @@ for col in df.select_dtypes(include=np.number):
     z_scores = (df[col] - mean) / std
     outliers = df[(z_scores > 3) | (z_scores < -3)]
     if not outliers.empty:
-        erros.append(("outlier", f"Outliers na coluna '{col}': {len(outliers)} valores além de 3σ."))
+        erros.append(("outlier", f"Outliers na coluna '{col}': {len(outliers)} com valores irregulares."))
 
 # ---------- CÁLCULO DE PORCENTAGEM ----------
 percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0

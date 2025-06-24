@@ -25,18 +25,18 @@ print(f"CSV '{os.path.basename(arquivo)}' carregado com {df.shape[0]} linhas e {
 # 1. Colunas sem nome
 total_verificacoes += 1
 if any(col is None or str(col).startswith("Unnamed") for col in df.columns):
-    erros.append("Colunas sem nome ou marcadas como 'Unnamed'.")
+    erros.append(("estrutura", "Colunas sem nome ou marcadas como 'Unnamed'."))
 
 # 2. Colunas completamente vazias
 total_verificacoes += 1
 null_cols = df.columns[df.isnull().all()]
 if len(null_cols) > 0:
-    erros.append(f"Colunas totalmente vazias: {list(null_cols)}")
+    erros.append(("estrutura", f"Colunas totalmente vazias: {list(null_cols)}"))
 
 # 3. Linhas duplicadas
 total_verificacoes += 1
 if df.duplicated().any():
-    erros.append("Linhas duplicadas detectadas.")
+    erros.append(("estrutura", "Linhas duplicadas detectadas."))
 
 # 4. Desequilíbrio de categorias (para colunas categóricas com até 10 valores únicos)
 for col in df.select_dtypes(include='object'):
@@ -44,14 +44,14 @@ for col in df.select_dtypes(include='object'):
     if df[col].nunique() <= 10:
         proporcoes = df[col].value_counts(normalize=True)
         if proporcoes.max() > 0.7:
-            erros.append(f"Coluna '{col}' com desequilíbrio: {proporcoes.to_dict()}")
+            erros.append(("equidade", f"Coluna '{col}' com desequilíbrio: {proporcoes.to_dict()}"))
 
 # 5. Miscoding: números como texto
 for col in df.select_dtypes(include='object'):
     total_verificacoes += 1
     try:
         pd.to_numeric(df[col])
-        erros.append(f"Possível miscoding: coluna '{col}' contém números como texto.")
+        erros.append(("miscoding", f"Possível miscoding: coluna '{col}' contém números como texto."))
     except:
         pass
 
@@ -62,7 +62,7 @@ for col in df.select_dtypes(include='object'):
         continue
     unique_vals = df[col].dropna().unique()
     if any(isinstance(val, str) and val != val.lower() and val != val.upper() for val in unique_vals):
-        erros.append(f"Inconsistência de capitalização em '{col}'.")
+        erros.append(("miscoding", f"Inconsistência de capitalização em '{col}'."))
 
 # 7. Outliers numéricos (z-score > 3 ou < -3)
 for col in df.select_dtypes(include=np.number):
@@ -79,13 +79,13 @@ for col in df.select_dtypes(include=np.number):
     outliers = df[(z_scores > 3) | (z_scores < -3)]
 
     if not outliers.empty:
-        erros.append(f"Outliers na coluna '{col}': {len(outliers)} com valores irregulares.")
+        erros.append(("outlier", f"Outliers na coluna '{col}': {len(outliers)} com valores irregulares."))
 
 # Resultado
 if erros:
     print("Problemas encontrados no arquivo:")
-    for erro in erros:
-        print("-", erro)
+    for categoria, erro in erros:
+        print(f"  * [{categoria.upper()}] {erro}")
     print()
 else:
     print("Nenhum erro identificado com as heurísticas aplicadas.\n")
