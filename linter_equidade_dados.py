@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 # Caminho do arquivo (permite argumento por linha de comando)
-arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_validos.csv"
+arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/all_disciplines_combined.csv"
 
 # Lista de erros detectados
 erros = []
