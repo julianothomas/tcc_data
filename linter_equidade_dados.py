@@ -3,17 +3,16 @@ import pandas as pd
 import numpy as np
 import os
 
-# Caminho do arquivo (permite argumento por linha de comando)
+
 arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/Pavament_Dataset.csv"
 
-# Lista de erros detectados
+#Contador de erros
 erros = []
-total_verificacoes = 0  # Contador de verificações feitas
+total_verificacoes = 0  
 
-# Conjunto de colunas a ignorar para miscoding (ex: nomes próprios)
 COLUNAS_EXCECAO = {'nome', 'nome_completo', 'nome_aluno', 'first_name', 'last_name'}
 
-# Leitura segura do CSV
+
 try:
     df = pd.read_csv(arquivo)
 except Exception as e:
@@ -22,23 +21,23 @@ except Exception as e:
 
 print(f"Arquivo CSV '{os.path.basename(arquivo)}' carregado com {df.shape[0]} linhas e {df.shape[1]} colunas carregao com sucesso.\n")
 
-# 1. Colunas sem nome
+#----Colunas sem nome----
 total_verificacoes += 1
 if any(col is None or str(col).startswith("Unnamed") for col in df.columns):
     erros.append(("estrutura", "Colunas sem nome ou marcadas como 'Unnamed'."))
 
-# 2. Colunas completamente vazias
+#----Colunas completamente vazias----
 total_verificacoes += 1
 null_cols = df.columns[df.isnull().all()]
 if len(null_cols) > 0:
     erros.append(("estrutura", f"Colunas totalmente vazias: {list(null_cols)}"))
 
-# 3. Linhas duplicadas
+#----Linhas duplicadas----
 total_verificacoes += 1
 if df.duplicated().any():
     erros.append(("estrutura", "Linhas duplicadas detectadas."))
 
-# 4. Desequilíbrio de categorias (para colunas categóricas com até 10 valores únicos)
+#----Desequilíbrio de categorias----
 for col in df.select_dtypes(include='object'):
     total_verificacoes += 1
     if df[col].nunique() <= 10:
@@ -46,7 +45,7 @@ for col in df.select_dtypes(include='object'):
         if proporcoes.max() > 0.7:
             erros.append(("equidade", f"Coluna '{col}' com desequilíbrio: {proporcoes.to_dict()}"))
 
-# 5. Miscoding: números como texto
+#----Miscoding: números como texto----
 for col in df.select_dtypes(include='object'):
     total_verificacoes += 1
     try:
@@ -55,7 +54,7 @@ for col in df.select_dtypes(include='object'):
     except:
         pass
 
-# 6. Miscoding: capitalização inconsistente
+# ----iscoding: capitalização inconsistente----
 for col in df.select_dtypes(include='object'):
     total_verificacoes += 1
     if col.lower() in COLUNAS_EXCECAO:
@@ -64,16 +63,16 @@ for col in df.select_dtypes(include='object'):
     if any(isinstance(val, str) and val != val.lower() and val != val.upper() for val in unique_vals):
         erros.append(("miscoding", f"Inconsistência de capitalização em '{col}'."))
 
-# 7. Outliers numéricos (z-score > 3 ou < -3)
+#----Outliers numéricos----
 for col in df.select_dtypes(include=np.number):
     total_verificacoes += 1
     if df[col].nunique() <= 1:
-        continue  # ignora colunas constantes ou binárias
+        continue 
     std = df[col].std(ddof=0)
     mean = df[col].mean()
 
     if pd.isna(std) or std == 0:
-        continue  # ignora se o desvio padrão não é válido
+        continue 
 
     z_scores = (df[col] - mean) / std
     outliers = df[(z_scores > 3) | (z_scores < -3)]
@@ -81,7 +80,7 @@ for col in df.select_dtypes(include=np.number):
     if not outliers.empty:
         erros.append(("outlier", f"Outliers na coluna '{col}': {len(outliers)} com valores irregulares."))
 
-# Porcentagem de erros
+#Calcula porcentagem de erros e acertos
 percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
 percentual_corretos = 100 - percentual_erros
 print(f"Total de verificações: {total_verificacoes}")
@@ -89,7 +88,7 @@ print(f"Lints detectados: {len(erros)}")
 print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
 print(f"Porcentagem de dados considerados corretos: {percentual_corretos:.2f}%")
 
-# Resultado
+#Imprime o resultado
 if erros:
     print("Heurísticas(Lints) encontradas:")
     for categoria, erro in erros:

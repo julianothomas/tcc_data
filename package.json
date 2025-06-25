@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky",
-    "test": "echo \"Rodando testes (ou linter)...\" && exit 0"
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",

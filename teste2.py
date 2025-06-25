@@ -85,12 +85,12 @@ percentual_corretos = 100 - percentual_erros
 
 # ---------- VISUALIZAÇÃO NO TERMINAL ----------
 if erros:
-    print("⚠️  Problemas encontrados:")
+    print("Problemas encontrados:")
     for categoria, mensagem in erros:
         print(f"  • [{categoria.upper()}] {mensagem}")
     print()
 else:
-    print("✅ Nenhum erro identificado com as heurísticas aplicadas.\n")
+    print("Nenhum erro identificado com as heurísticas aplicadas.\n")
 
 print(f"Total de verificações: {total_verificacoes}")
 print(f"Lints detectados: {len(erros)}")
@@ -113,6 +113,6 @@ try:
                 f.write(f" - [{categoria}] {message}\n")
         else:
             f.write("Nenhum erro foi encontrado.\n")
-    print(f"\n📝 Relatório salvo em: {relatorio_path}")
+    print(f"\nRelatório salvo em: {relatorio_path}")
 except Exception as e:
     print(f"Erro ao salvar o relatório: {e}")
