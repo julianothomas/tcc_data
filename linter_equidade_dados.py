@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 
-arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/Pavament_Dataset.csv"
+arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_invalidos.csv"
 
 #Contador de erros
 erros = []
@@ -54,7 +54,7 @@ for col in df.select_dtypes(include='object'):
     except:
         pass
 
-# ----iscoding: capitalização inconsistente----
+# ----Miscoding: capitalização inconsistente----
 for col in df.select_dtypes(include='object'):
     total_verificacoes += 1
     if col.lower() in COLUNAS_EXCECAO:

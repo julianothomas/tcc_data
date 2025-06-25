@@ -12,6 +12,28 @@ total_verificacoes = 0
 
 COLUNAS_EXCECAO = {'nome', 'nome_completo', 'nome_aluno', 'first_name', 'last_name'}
 
+# Heurísticas disponíveis
+heuristicas_disponiveis = {
+    '1': 'colunas_sem_nome',
+    '2': 'colunas_vazias',
+    '3': 'linhas_duplicadas',
+    '4': 'desequilibrio_categorias',
+    '5': 'miscoding_numerico',
+    '6': 'miscoding_caps',
+    '7': 'outliers'
+}
+
+print("SELECIONE AS HEURÍSTICAS QUE DESEJA APLICAR:")
+for num, nome in heuristicas_disponiveis.items():
+    print(f"{num}. {nome.replace('_', ' ').capitalize()}")
+
+selecionadas = input("Digite os números separados por vírgula (ex: 1,3,5): ").split(',')
+selecionadas = [heuristicas_disponiveis.get(op.strip()) for op in selecionadas if op.strip() in heuristicas_disponiveis]
+
+if not selecionadas:
+    print("Nenhuma heurística válida selecionada. Encerrando.")
+    sys.exit(0)
+
 
 try:
     df = pd.read_csv(arquivo)
@@ -83,7 +105,7 @@ for col in df.select_dtypes(include=np.number):
 #Calcula porcentagem de erros e acertos
 percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
 percentual_corretos = 100 - percentual_erros
-print(f"Total de verificações: {total_verificacoes}")
+print(f"\nTotal de verificações: {total_verificacoes}")
 print(f"Lints detectados: {len(erros)}")
 print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
 print(f"Porcentagem de dados considerados corretos: {percentual_corretos:.2f}%")
