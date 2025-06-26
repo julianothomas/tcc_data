@@ -47,20 +47,20 @@ print(f"Arquivo CSV '{os.path.basename(arquivo)}' carregado com {df.shape[0]} li
 if 'colunas_sem_nome' in selecionadas:
     total_verificacoes += 1
     if any(col is None or str(col).startswith("Unnamed") for col in df.columns):
-        erros.append(("estrutura", "Colunas sem nome ou marcadas como 'Unnamed'."))
+        erros.append(("colunas_snome", "Colunas sem nome ou marcadas como 'Unnamed'."))
 
 # ---- Heurística 2: Colunas completamente vazias ----
 if 'colunas_vazias' in selecionadas:
     total_verificacoes += 1
     null_cols = df.columns[df.isnull().all()]
     if len(null_cols) > 0:
-        erros.append(("estrutura", f"Colunas totalmente vazias: {list(null_cols)}"))
+        erros.append(("colunas_vazias", f"Colunas totalmente vazias: {list(null_cols)}"))
 
 # ---- Heurística 3: Linhas duplicadas ----
 if 'linhas_duplicadas' in selecionadas:
     total_verificacoes += 1
     if df.duplicated().any():
-        erros.append(("estrutura", "Linhas duplicadas detectadas."))
+        erros.append(("duplicadas", "Linhas duplicadas detectadas."))
 
 # ---- Heurística 4: Desequilíbrio de categorias ----
 if 'desequilibrio_categorias' in selecionadas:

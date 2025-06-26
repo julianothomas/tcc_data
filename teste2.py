@@ -4,41 +4,21 @@ import numpy as np
 import os
 import sys
 
-def get_staged_csv_files():
-    """Retorna lista de arquivos .csv que estão no stage do Git."""
-    try:
-        result = subprocess.run(
-            ["git", "diff", "--cached", "--name-only"],
-            capture_output=True, text=True
-        )
-        arquivos = result.stdout.strip().split('\n')
-        return [f for f in arquivos if f.endswith('.csv')]
-    except Exception as e:
-        print(f"Erro ao obter arquivos do Git: {e}")
-        return []
-
-# 1. Descobre arquivos CSV no stage
-csv_files = get_staged_csv_files()
-
-if not csv_files:
-    print("✅ Nenhum arquivo CSV encontrado no stage.")
+# Se não receber arquivos como argumento, exibe ajuda
+if len(sys.argv) < 2:
+    print("⚠️ Nenhum arquivo CSV informado para verificação.")
     sys.exit(0)
 
-# 2. Se múltiplos arquivos, pergunta qual usar
-if len(csv_files) == 1:
-    arquivo = csv_files[0]
-else:
-    print("📂 Múltiplos arquivos CSV no stage:")
-    for i, f in enumerate(csv_files, 1):
-        print(f"{i}) {f}")
-    try:
-        escolha = int(input("Digite o número do arquivo a validar: "))
-        arquivo = csv_files[escolha - 1]
-    except (ValueError, IndexError):
-        print("❌ Escolha inválida.")
-        sys.exit(1)
+erros_detectados = False
 
-print(f"\n📁 Arquivo selecionado: {arquivo}")
+for arquivo in sys.argv[1:]:
+    if not arquivo.endswith(".csv"):
+        continue
+
+    erros = []
+    total_verificacoes = 0
+
+    print(f"\n📂 Verificando arquivo: {arquivo}")
 
 # Inicializa variáveis
 erros = []

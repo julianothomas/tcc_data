@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 
-arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_validos.csv"
+arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/Pavament_Dataset.csv"
 
 #Contador de erros
 erros = []
