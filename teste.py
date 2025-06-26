@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 
-arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_validos.csv"
+arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_invalidos.csv"
 
 #Contador de erros
 erros = []
@@ -43,64 +43,72 @@ except Exception as e:
 
 print(f"Arquivo CSV '{os.path.basename(arquivo)}' carregado com {df.shape[0]} linhas e {df.shape[1]} colunas carregao com sucesso.\n")
 
-#----Colunas sem nome----
-total_verificacoes += 1
-if any(col is None or str(col).startswith("Unnamed") for col in df.columns):
-    erros.append(("estrutura", "Colunas sem nome ou marcadas como 'Unnamed'."))
-
-#----Colunas completamente vazias----
-total_verificacoes += 1
-null_cols = df.columns[df.isnull().all()]
-if len(null_cols) > 0:
-    erros.append(("estrutura", f"Colunas totalmente vazias: {list(null_cols)}"))
-
-#----Linhas duplicadas----
-total_verificacoes += 1
-if df.duplicated().any():
-    erros.append(("estrutura", "Linhas duplicadas detectadas."))
-
-#----Desequilíbrio de categorias----
-for col in df.select_dtypes(include='object'):
+# ---- Heurística 1: Colunas sem nome ----
+if 'colunas_sem_nome' in selecionadas:
     total_verificacoes += 1
-    if df[col].nunique() <= 10:
-        proporcoes = df[col].value_counts(normalize=True)
-        if proporcoes.max() > 0.7:
-            erros.append(("equidade", f"Coluna '{col}' com desequilíbrio: {proporcoes.to_dict()}"))
+    if any(col is None or str(col).startswith("Unnamed") for col in df.columns):
+        erros.append(("estrutura", "Colunas sem nome ou marcadas como 'Unnamed'."))
 
-#----Miscoding: números como texto----
-for col in df.select_dtypes(include='object'):
+# ---- Heurística 2: Colunas completamente vazias ----
+if 'colunas_vazias' in selecionadas:
     total_verificacoes += 1
-    try:
-        pd.to_numeric(df[col])
-        erros.append(("miscoding", f"Possível miscoding: coluna '{col}' contém números como texto."))
-    except:
-        pass
+    null_cols = df.columns[df.isnull().all()]
+    if len(null_cols) > 0:
+        erros.append(("estrutura", f"Colunas totalmente vazias: {list(null_cols)}"))
 
-# ----iscoding: capitalização inconsistente----
-for col in df.select_dtypes(include='object'):
+# ---- Heurística 3: Linhas duplicadas ----
+if 'linhas_duplicadas' in selecionadas:
     total_verificacoes += 1
-    if col.lower() in COLUNAS_EXCECAO:
-        continue
-    unique_vals = df[col].dropna().unique()
-    if any(isinstance(val, str) and val != val.lower() and val != val.upper() for val in unique_vals):
-        erros.append(("miscoding", f"Inconsistência de capitalização em '{col}'."))
+    if df.duplicated().any():
+        erros.append(("estrutura", "Linhas duplicadas detectadas."))
 
-#----Outliers numéricos----
-for col in df.select_dtypes(include=np.number):
-    total_verificacoes += 1
-    if df[col].nunique() <= 1:
-        continue 
-    std = df[col].std(ddof=0)
-    mean = df[col].mean()
+# ---- Heurística 4: Desequilíbrio de categorias ----
+if 'desequilibrio_categorias' in selecionadas:
+    for col in df.select_dtypes(include='object'):
+        total_verificacoes += 1
+        if df[col].nunique() <= 10:
+            proporcoes = df[col].value_counts(normalize=True)
+            if proporcoes.max() > 0.7:
+                erros.append(("equidade", f"Coluna '{col}' com desequilíbrio: {proporcoes.to_dict()}"))
 
-    if pd.isna(std) or std == 0:
-        continue 
+# ---- Heurística 5: Miscoding numérico ----
+if 'miscoding_numerico' in selecionadas:
+    for col in df.select_dtypes(include='object'):
+        total_verificacoes += 1
+        try:
+            pd.to_numeric(df[col])
+            erros.append(("miscoding", f"Possível miscoding: coluna '{col}' contém números como texto."))
+        except:
+            pass
 
-    z_scores = (df[col] - mean) / std
-    outliers = df[(z_scores > 3) | (z_scores < -3)]
+# ---- Heurística 6: Miscoding capitalização ----
+if 'miscoding_caps' in selecionadas:
+    for col in df.select_dtypes(include='object'):
+        total_verificacoes += 1
+        if col.lower() in COLUNAS_EXCECAO:
+            continue
+        unique_vals = df[col].dropna().unique()
+        if any(isinstance(val, str) and val != val.lower() and val != val.upper() for val in unique_vals):
+            erros.append(("miscoding", f"Inconsistência de capitalização em '{col}'."))
 
-    if not outliers.empty:
-        erros.append(("outlier", f"Outliers na coluna '{col}': {len(outliers)} com valores irregulares."))
+# ---- Heurística 7: Outliers ----
+if 'outliers' in selecionadas:
+    for col in df.select_dtypes(include=np.number):
+        total_verificacoes += 1
+        if df[col].nunique() <= 1:
+            continue
+        std = df[col].std(ddof=0)
+        mean = df[col].mean()
+
+        if pd.isna(std) or std == 0:
+            continue
+
+        z_scores = (df[col] - mean) / std
+        outliers = df[(z_scores > 3) | (z_scores < -3)]
+
+        if not outliers.empty:
+            erros.append(("outlier", f"Outliers na coluna '{col}': {len(outliers)} com valores irregulares."))
+
 
 #Calcula porcentagem de erros e acertos
 percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
