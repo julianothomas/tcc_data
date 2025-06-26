@@ -4,6 +4,8 @@ import numpy as np
 import os
 import sys
 
+COLUNAS_EXCECAO = {'nome', 'nome_completo', 'nome_aluno', 'first_name', 'last_name'}
+
 # Se não receber arquivos como argumento, exibe ajuda
 if len(sys.argv) < 2:
     print("⚠️ Nenhum arquivo CSV informado para verificação.")
@@ -20,20 +22,14 @@ for arquivo in sys.argv[1:]:
 
     print(f"\n📂 Verificando arquivo: {arquivo}")
 
-# Inicializa variáveis
-erros = []
-total_verificacoes = 0
-erros_detectados = False
-COLUNAS_EXCECAO = {'nome', 'nome_completo', 'nome_aluno', 'first_name', 'last_name'}
+    try:
+        df = pd.read_csv(arquivo)
+    except Exception as e:
+        print(f"❌ Erro ao ler o arquivo CSV '{arquivo}': {e}")
+        erros_detectados = True
+        continue
 
-# 3. Tenta carregar o CSV
-try:
-    df = pd.read_csv(arquivo)
-except Exception as e:
-    print(f"❌ Erro ao ler o arquivo CSV: {e}")
-    sys.exit(1)
-
-print(f"✔️ CSV '{arquivo}' carregado com {df.shape[0]} linhas e {df.shape[1]} colunas.\n")
+    print(f"✔️ Arquivo carregado com {df.shape[0]} linhas e {df.shape[1]} colunas.\n")
 
 # ---- Colunas sem nome ----
 total_verificacoes += 1
