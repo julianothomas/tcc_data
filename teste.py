@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 
-arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/dados_invalidos.csv"
+arquivo = sys.argv[1] if len(sys.argv) > 1 else "data/all_disciplines_combined.csv"
 
 #Contador de erros
 erros = []

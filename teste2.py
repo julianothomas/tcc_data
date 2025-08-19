@@ -8,7 +8,7 @@ COLUNAS_EXCECAO = {'nome', 'nome_completo', 'nome_aluno', 'first_name', 'last_na
 
 # Se não receber arquivos como argumento, exibe ajuda
 if len(sys.argv) < 2:
-    print("⚠️ Nenhum arquivo CSV informado para verificação.")
+    print("Nenhum arquivo CSV informado para verificação.")
     sys.exit(0)
 
 erros_detectados = False
@@ -20,16 +20,16 @@ for arquivo in sys.argv[1:]:
     erros = []
     total_verificacoes = 0
 
-    print(f"\n📂 Verificando arquivo: {arquivo}")
+    print(f"\nVerificando arquivo: {arquivo}")
 
     try:
         df = pd.read_csv(arquivo)
     except Exception as e:
-        print(f"❌ Erro ao ler o arquivo CSV '{arquivo}': {e}")
+        print(f"Erro ao ler o arquivo CSV '{arquivo}': {e}")
         erros_detectados = True
         continue
 
-    print(f"✔️ Arquivo carregado com {df.shape[0]} linhas e {df.shape[1]} colunas.\n")
+    print(f"Arquivo carregado com {df.shape[0]} linhas e {df.shape[1]} colunas.\n")
 
 # ---- Colunas sem nome ----
 total_verificacoes += 1
@@ -94,18 +94,18 @@ for col in df.select_dtypes(include=np.number):
 percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
 percentual_corretos = 100 - percentual_erros
 
-print(f"\n📊 Total de verificações: {total_verificacoes}")
-print(f"🚫 Lints detectados: {len(erros)}")
-print(f"❌ Porcentagem de erros: {percentual_erros:.2f}%")
-print(f"✅ Porcentagem de dados corretos: {percentual_corretos:.2f}%\n")
+print(f"\nTotal de verificações: {total_verificacoes}")
+print(f"Lints detectados: {len(erros)}")
+print(f"Porcentagem de erros: {percentual_erros:.2f}%")
+print(f"Porcentagem de dados corretos: {percentual_corretos:.2f}%\n")
 
 if erros:
-    print("📋 Heurísticas (Lints) encontradas:")
+    print("Heurísticas (Lints) encontradas:")
     for categoria, erro in erros:
         print(f"  * [{categoria.upper()}] {erro}")
     erros_detectados = True
 else:
-    print("✅ Nenhum erro identificado com as heurísticas aplicadas.")
+    print("Nenhum erro identificado com as heurísticas aplicadas.")
 
 # Encerra com código de erro se necessário
 sys.exit(1 if erros_detectados else 0)
