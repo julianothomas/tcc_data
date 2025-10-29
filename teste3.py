@@ -51,7 +51,6 @@ def outliers(df):
             problemas[col] = outliers.tolist()
     return problemas
 
-
 # --- Mapeamento de heurísticas ---
 HEURISTICAS = {
     "colunas_sem_nome": colunas_sem_nome,
@@ -62,7 +61,6 @@ HEURISTICAS = {
     "miscoding_caps": miscoding_caps,
     "outliers": outliers,
 }
-
 
 def main():
     # Arquivos CSV do stage (recebidos do pre-commit ou linha de comando)
@@ -86,46 +84,29 @@ def main():
 
     print(f"🔍 Rodando heurísticas: {', '.join(heuristicas_escolhidas)}\n")
 
-    total_verificacoes = 0
-    erros = []
+    erro_detectado = False
 
     for arquivo in arquivos_csv:
         print(f"📂 Verificando: {arquivo}")
         try:
             df = pd.read_csv(arquivo)
         except Exception as e:
-            msg = f"Erro ao abrir {arquivo}: {e}"
-            print(f"  ❌ {msg}")
-            erros.append(("leitura", msg))
+            print(f"  ❌ Erro ao abrir {arquivo}: {e}")
+            erro_detectado = True
             continue
 
         for nome in heuristicas_escolhidas:
             func = HEURISTICAS.get(nome)
             if func:
-                total_verificacoes += 1
                 resultado = func(df)
                 if resultado:
-                    erros.append((nome, resultado))
+                    print(f"  ⚠ Problema detectado em '{nome}': {resultado}")
+                    erro_detectado = True
 
-    # ---- Estatísticas gerais ----
-    percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
-    percentual_corretos = 100 - percentual_erros
-
-    print("\n📊 --- RESUMO DAS VERIFICAÇÕES ---")
-    print(f"Total de verificações: {total_verificacoes}")
-    print(f"Lints detectados: {len(erros)}")
-    print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
-    print(f"Porcentagem de dados considerados corretos: {percentual_corretos:.2f}%")
-
-    # ---- Resultado detalhado ----
-    if erros:
-        print("\n🚨 Heurísticas (Lints) encontradas:")
-        for categoria, erro in erros:
-            print(f"  * [{categoria.upper()}] {erro}")
-        print()
-        sys.exit(1)
+    if erro_detectado:
+        sys.exit(1)  # Bloqueia o commit
     else:
-        print("✅ Nenhum erro identificado com as heurísticas aplicadas.\n")
+        print("✅ Nenhum problema encontrado nos CSVs.")
         sys.exit(0)
 
 

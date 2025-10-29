@@ -1,0 +1,6 @@
+{
+  "heuristicas": [
+    "colunas_vazias",
+    "desequilibrio_categorias"
+  ]
+}
