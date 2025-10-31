@@ -16,7 +16,7 @@ def desequilibrio_categorias(df):
     problemas = {}
     for col in df.select_dtypes(include=["object", "category"]):
         freq = df[col].value_counts(normalize=True)
-        if any(freq > 0.9):  # Exemplo: uma categoria domina mais de 90%
+        if any(freq > 0.9):
             problemas[col] = freq.to_dict()
     return problemas
 
@@ -64,65 +64,79 @@ HEURISTICAS = {
 }
 
 
-def main():
-    # Arquivos CSV do stage (recebidos do pre-commit ou linha de comando)
-    arquivos_csv = sys.argv[1:]
-    if not arquivos_csv:
-        print("⚠ Nenhum arquivo CSV informado.")
-        sys.exit(0)
+def resetar_config():
+    """Restaura o arquivo heuristicas.config.json para o estado padrão."""
+    estado_inicial = {
+        "heuristicas": [],
+        "arquivo_csv": None
+    }
+    with open("heuristicas.config.json", "w", encoding="utf-8") as f:
+        json.dump(estado_inicial, f, indent=4, ensure_ascii=False)
+    print("♻️  Arquivo 'heuristicas.config.json' foi resetado para o estado inicial.\n")
 
-    # Carregar heurísticas escolhidas no JSON
+
+def main():
+    # --- Lê arquivo de configuração ---
     try:
         with open("heuristicas.config.json", "r", encoding="utf-8") as f:
             config = json.load(f)
-            heuristicas_escolhidas = config.get("heuristicas", [])
     except FileNotFoundError:
         print("⚠ Arquivo 'heuristicas.config.json' não encontrado. Rode `node configurar-heuristicas.js` antes.")
         sys.exit(1)
 
-    if not heuristicas_escolhidas:
-        print("⚠ Nenhuma heurística configurada. Rode `node configurar-heuristicas.js` para definir.")
+    heuristicas_escolhidas = config.get("heuristicas", [])
+    arquivo_csv = config.get("arquivo_csv", None)
+
+    if not arquivo_csv:
+        print("⚠ Nenhum arquivo CSV definido em heuristicas.config.json.")
         sys.exit(1)
 
-    print(f"🔍 Rodando heurísticas: {', '.join(heuristicas_escolhidas)}\n")
+    if not heuristicas_escolhidas:
+        print("⚠ Nenhuma heurística configurada.")
+        sys.exit(1)
 
-    total_verificacoes = 0
+    print(f"📄 Arquivo selecionado: {arquivo_csv}")
+    print(f"🔍 Heurísticas a aplicar: {', '.join(heuristicas_escolhidas)}\n")
+
+    # --- Lê o CSV ---
+    try:
+        df = pd.read_csv(arquivo_csv)
+    except Exception as e:
+        print(f"❌ Erro ao abrir '{arquivo_csv}': {e}")
+        sys.exit(1)
+
+    # --- Executa as heurísticas ---
+    total_verificacoes = len(heuristicas_escolhidas)
     erros = []
 
-    for arquivo in arquivos_csv:
-        print(f"📂 Verificando: {arquivo}")
-        try:
-            df = pd.read_csv(arquivo)
-        except Exception as e:
-            msg = f"Erro ao abrir {arquivo}: {e}"
-            print(f"  ❌ {msg}")
-            erros.append(("leitura", msg))
-            continue
+    for nome in heuristicas_escolhidas:
+        func = HEURISTICAS.get(nome)
+        if func:
+            resultado = func(df)
+            if resultado:
+                erros.append((nome, resultado))
 
-        for nome in heuristicas_escolhidas:
-            func = HEURISTICAS.get(nome)
-            if func:
-                total_verificacoes += 1
-                resultado = func(df)
-                if resultado:
-                    erros.append((nome, resultado))
-
-    # ---- Estatísticas gerais ----
+    # --- Calcula estatísticas ---
     percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
     percentual_corretos = 100 - percentual_erros
 
-    print("\n📊 --- RESUMO DAS VERIFICAÇÕES ---")
-    print(f"Total de verificações: {total_verificacoes}")
+    print(f"\nTotal de verificações: {total_verificacoes}")
     print(f"Lints detectados: {len(erros)}")
     print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
-    print(f"Porcentagem de dados considerados corretos: {percentual_corretos:.2f}%")
+    print(f"Porcentagem de dados corretos: {percentual_corretos:.2f}%\n")
 
-    # ---- Resultado detalhado ----
+    # --- Exibe resultados ---
     if erros:
-        print("\n🚨 Heurísticas (Lints) encontradas:")
+        print("Heurísticas (Lints) encontradas:")
         for categoria, erro in erros:
             print(f"  * [{categoria.upper()}] {erro}")
         print()
+
+    # --- Resetar configuração antes de sair ---
+    resetar_config()
+
+    # --- Sair com código apropriado ---
+    if erros:
         sys.exit(1)
     else:
         print("✅ Nenhum erro identificado com as heurísticas aplicadas.\n")

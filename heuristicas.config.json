@@ -1,6 +1,4 @@
 {
-  "heuristicas": [
-    "colunas_vazias",
-    "desequilibrio_categorias"
-  ]
+    "heuristicas": [],
+    "arquivo_csv": null
 }
