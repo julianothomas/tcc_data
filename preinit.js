@@ -12,7 +12,6 @@ const heuristicas = {
   '7': 'outliers'
 };
 
-// Caminho da pasta onde estão os CSVs
 const pastaCSV = path.join(__dirname, '../husky/data');
 
 const rl = readline.createInterface({
@@ -20,25 +19,24 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-console.log("🧩 CONFIGURAÇÃO DE HEURÍSTICAS");
+console.log("CONFIGURAÇÃO DE HEURÍSTICAS");
 
-// 1️⃣ Verifica arquivos CSV disponíveis
 let arquivosCSV = [];
 try {
   arquivosCSV = fs.readdirSync(pastaCSV).filter(f => f.endsWith('.csv'));
 } catch {
-  console.log(`⚠ Pasta '${pastaCSV}' não encontrada. Crie-a e adicione arquivos CSV.`);
+  console.log(`Pasta '${pastaCSV}' não encontrada. Crie-a e adicione arquivos CSV.`);
   rl.close();
   process.exit(1);
 }
 
 if (arquivosCSV.length === 0) {
-  console.log("⚠ Nenhum arquivo CSV encontrado na pasta 'data/'. Adicione e tente novamente.");
+  console.log("Nenhum arquivo CSV encontrado na pasta 'data/'. Adicione e tente novamente.");
   rl.close();
   process.exit(1);
 }
 
-console.log("\n📂 ARQUIVOS DISPONÍVEIS:");
+console.log("\nARQUIVOS DISPONÍVEIS:");
 arquivosCSV.forEach((f, i) => console.log(`${i + 1}. ${f}`));
 
 rl.question("\nDigite o número do arquivo CSV que deseja validar: ", (inputArquivo) => {
@@ -46,12 +44,12 @@ rl.question("\nDigite o número do arquivo CSV que deseja validar: ", (inputArqu
   const arquivoSelecionado = arquivosCSV[indexArquivo];
 
   if (!arquivoSelecionado) {
-    console.log("⚠ Seleção inválida. Encerrando.");
+    console.log("Seleção inválida. Encerrando.");
     rl.close();
     return;
   }
 
-  console.log("\n🔍 SELECIONE AS HEURÍSTICAS QUE DESEJA APLICAR:");
+  console.log("\nSELECIONE AS HEURÍSTICAS QUE DESEJA APLICAR:");
   for (const [num, nome] of Object.entries(heuristicas)) {
     console.log(`${num}. ${nome}`);
   }
@@ -63,12 +61,11 @@ rl.question("\nDigite o número do arquivo CSV que deseja validar: ", (inputArqu
       .filter(Boolean);
 
     if (selecionadas.length === 0) {
-      console.log("⚠ Nenhuma heurística válida selecionada. Encerrando.");
+      console.log("Nenhuma heurística válida selecionada. Encerrando.");
       rl.close();
       return;
     }
 
-    // Monta o objeto final com CSV + heurísticas
     const configuracao = {
       arquivo_csv: path.join(pastaCSV, arquivoSelecionado),
       heuristicas: selecionadas
@@ -79,9 +76,9 @@ rl.question("\nDigite o número do arquivo CSV que deseja validar: ", (inputArqu
       JSON.stringify(configuracao, null, 2)
     );
 
-    console.log("\n✅ Preferências salvas em 'heuristicas.config.json':");
-    console.log(`📄 Arquivo selecionado: ${arquivoSelecionado}`);
-    console.log(`🔧 Heurísticas: ${selecionadas.join(', ')}`);
+    console.log("\nPreferências salvas em 'heuristicas.config.json':");
+    console.log(`Arquivo selecionado: ${arquivoSelecionado}`);
+    console.log(`Heurísticas: ${selecionadas.join(', ')}`);
 
     rl.close();
   });

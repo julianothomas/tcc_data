@@ -72,7 +72,7 @@ def resetar_config():
     }
     with open("heuristicas.config.json", "w", encoding="utf-8") as f:
         json.dump(estado_inicial, f, indent=4, ensure_ascii=False)
-    print("♻️  Arquivo 'heuristicas.config.json' foi resetado para o estado inicial.\n")
+    print("Arquivo 'heuristicas.config.json' foi resetado para o estado inicial.\n")
 
 
 def main():
@@ -81,28 +81,28 @@ def main():
         with open("heuristicas.config.json", "r", encoding="utf-8") as f:
             config = json.load(f)
     except FileNotFoundError:
-        print("⚠ Arquivo 'heuristicas.config.json' não encontrado. Rode `node configurar-heuristicas.js` antes.")
+        print("Arquivo 'heuristicas.config.json' não encontrado. Rode `node configurar-heuristicas.js` antes.")
         sys.exit(1)
 
     heuristicas_escolhidas = config.get("heuristicas", [])
     arquivo_csv = config.get("arquivo_csv", None)
 
     if not arquivo_csv:
-        print("⚠ Nenhum arquivo CSV definido em heuristicas.config.json.")
+        print("Nenhum arquivo CSV definido em heuristicas.config.json.")
         sys.exit(1)
 
     if not heuristicas_escolhidas:
-        print("⚠ Nenhuma heurística configurada.")
+        print("Nenhuma heurística configurada.")
         sys.exit(1)
 
-    print(f"📄 Arquivo selecionado: {arquivo_csv}")
-    print(f"🔍 Heurísticas a aplicar: {', '.join(heuristicas_escolhidas)}\n")
+    print(f"Arquivo selecionado: {arquivo_csv}")
+    print(f"Heurísticas que serão aplicadas: {', '.join(heuristicas_escolhidas)}\n")
 
     # --- Lê o CSV ---
     try:
         df = pd.read_csv(arquivo_csv)
     except Exception as e:
-        print(f"❌ Erro ao abrir '{arquivo_csv}': {e}")
+        print(f"Erro ao abrir '{arquivo_csv}': {e}")
         sys.exit(1)
 
     # --- Executa as heurísticas ---
@@ -139,7 +139,7 @@ def main():
     if erros:
         sys.exit(1)
     else:
-        print("✅ Nenhum erro identificado com as heurísticas aplicadas.\n")
+        print("Nenhum erro identificado com as heurísticas aplicadas.\n")
         sys.exit(0)
 
 
