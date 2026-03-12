@@ -2,11 +2,9 @@ import sys
 import json
 import pandas as pd
 import os
+import time
 
-# =====================================================
-# 🧩 Heurísticas aprimoradas — retornam localização do erro
-# =====================================================
-
+# --- Heurísticas implementadas ---
 def colunas_sem_nome(df):
     """Detecta colunas sem nome."""
     return [{"coluna": col} for col in df.columns if "Unnamed" in col]
@@ -96,11 +94,7 @@ def outliers(df):
             })
     return problemas
 
-
-# =====================================================
-# 🧭 Mapeamento das heurísticas
-# =====================================================
-
+# --- Mapeamento de heurísticas ---
 HEURISTICAS = {
     "colunas_sem_nome": colunas_sem_nome,
     "colunas_vazias": colunas_vazias,
@@ -111,11 +105,7 @@ HEURISTICAS = {
     "outliers": outliers,
 }
 
-
-# =====================================================
-# 🔁 Reset do arquivo de configuração
-# =====================================================
-
+# --- Reset das configurações heuristicas.config.json ---
 def resetar_config():
     estado_inicial = {"heuristicas": [], "arquivo_csv": None}
     with open("heuristicas.config.json", "w", encoding="utf-8") as f:
@@ -123,37 +113,40 @@ def resetar_config():
     print("Arquivo 'heuristicas.config.json' foi resetado para o estado inicial.\n")
 
 
-# =====================================================
-# 🚀 Execução principal
-# =====================================================
-
 def main():
+    
+    inicio = time.time()
+    
+    # --- Lê arquivo de configuração ---
     try:
         with open("heuristicas.config.json", "r", encoding="utf-8") as f:
             config = json.load(f)
     except FileNotFoundError:
-        print("Arquivo 'heuristicas.config.json' não encontrado.")
+        print("Arquivo 'heuristicas.config.json' não encontrado. Rode `node configurar-heuristicas.js` antes.")
         sys.exit(1)
 
     heuristicas_escolhidas = config.get("heuristicas", [])
     arquivo_csv = config.get("arquivo_csv", None)
 
     if not arquivo_csv or not os.path.exists(arquivo_csv):
-        print("Nenhum arquivo CSV válido encontrado.")
+        print("Nenhum arquivo CSV definido em heuristicas.config.json.")
         sys.exit(1)
+
     if not heuristicas_escolhidas:
         print("Nenhuma heurística configurada.")
         sys.exit(1)
 
-    print(f"📄 Arquivo: {arquivo_csv}")
-    print(f"🧠 Heurísticas: {', '.join(heuristicas_escolhidas)}\n")
+    print(f"Arquivo selecionado: {arquivo_csv}")
+    print(f"Heurísticas que serão aplicadas: {', '.join(heuristicas_escolhidas)}\n")
 
+    # --- Lê o CSV ---
     try:
         df = pd.read_csv(arquivo_csv)
     except Exception as e:
         print(f"Erro ao abrir '{arquivo_csv}': {e}")
         sys.exit(1)
 
+    # --- Executa as heurísticas ---
     total_verificacoes = len(heuristicas_escolhidas)
     erros = []
 
@@ -164,25 +157,34 @@ def main():
             if resultado:
                 erros.append((nome, resultado))
 
+    # --- Calcula estatísticas ---
     percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
     percentual_corretos = 100 - percentual_erros
 
-    print(f"\n📊 Total de verificações: {total_verificacoes}")
-    print(f"❗ Lints detectados: {len(erros)}")
-    print(f"⚠️  Porcentagem de lints encontrados: {percentual_erros:.2f}%")
-    print(f"✅ Porcentagem de dados corretos: {percentual_corretos:.2f}%\n")
+    print(f"\nTotal de verificações: {total_verificacoes}")
+    print(f"Lints detectados: {len(erros)}")
+    print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
+    print(f"Porcentagem de dados corretos: {percentual_corretos:.2f}%\n")
 
+    # --- Exibe resultados ---
     if erros:
-        print("🚨 Problemas encontrados:")
+        print("Heurísticas (Lints) encontradas:")
         for categoria, lista in erros:
             print(f"\n[{categoria.upper()}]")
-            for item in lista[:10]:  # limita exibição
+            for item in lista[:30]:  # limita exibição
                 detalhes = ", ".join([f"{k}: {v}" for k, v in item.items()])
                 print(f"  - {detalhes}")
-        print("\n(Exibindo no máximo 10 ocorrências por heurística)\n")
+        print("\n(Exibindo no máximo 30 ocorrências por heurística)\n")
 
+    # --- Mostra tempo total de execução ---
+    fim = time.time()
+    duracao = fim - inicio
+    print(f"Tempo total de execução: {duracao:.2f} segundos\n")
+    
+    # --- Resetar configuração antes de sair ---
     resetar_config()
 
+    # --- Sair com código apropriado ---
     if erros:
         sys.exit(1)
     else:

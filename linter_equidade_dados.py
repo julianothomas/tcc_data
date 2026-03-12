@@ -1,6 +1,7 @@
 import sys
 import json
 import pandas as pd
+import time
 
 # --- Heurísticas implementadas ---
 def colunas_sem_nome(df):
@@ -76,6 +77,9 @@ def resetar_config():
 
 
 def main():
+
+    inicio = time.time()
+
     # --- Lê arquivo de configuração ---
     try:
         with open("heuristicas.config.json", "r", encoding="utf-8") as f:
@@ -132,6 +136,11 @@ def main():
             print(f"  * [{categoria.upper()}] {erro}")
         print()
 
+    # --- Mostra tempo total de execução ---
+    fim = time.time()
+    duracao = fim - inicio
+    print(f"Tempo total de execução: {duracao:.2f} segundos\n")
+    
     # --- Resetar configuração antes de sair ---
     resetar_config()
 

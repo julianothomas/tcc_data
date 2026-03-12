@@ -1,6 +1,8 @@
 {
-  "arquivo_csv": "E:\\Facul 25 - FIM\\tcc\\husky\\data\\dados_sem_erros.csv",
+  "arquivo_csv": "D:\\faculdade\\tcc\\husky\\data\\actors.csv",
   "heuristicas": [
-    "colunas_sem_nome"
+    "colunas_sem_nome",
+    "colunas_vazias",
+    "linhas_duplicadas"
   ]
 }
