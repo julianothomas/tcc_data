@@ -83,7 +83,7 @@ def miscoding_numerico(df):
         if dtype != "string":
             continue
 
-        convertido = df.withColumn("temp_num", F.expr(f"try_cast({col} AS DOUBLE)"))
+        convertido = df.withColumn("temp_num", F.expr(f"try_cast(`{col}` AS DOUBLE)"))
 
         erros = convertido.filter(
             (F.col(col).isNotNull()) &
@@ -208,6 +208,8 @@ def main():
         .config("spark.sql.shuffle.partitions", "4")
         .getOrCreate()
     )
+
+    spark.sparkContext.setLogLevel("ERROR")
 
     # --- Lê o CSV com Spark ---
     try:

@@ -104,7 +104,7 @@ def main():
 
     # --- Lê o CSV ---
     try:
-        df = pd.read_csv(arquivo_csv)
+        df = pd.read_csv(arquivo_csv, low_memory=False)
     except Exception as e:
         print(f"Erro ao abrir '{arquivo_csv}': {e}")
         sys.exit(1)
