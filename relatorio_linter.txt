@@ -5,3 +5,5 @@ Total de verificações: 51
 Lints encontrados: 10
 Porcentagem com erro: 19.61%
 Porcentagem correta: 80.39%
+
+Erros encontrados:
