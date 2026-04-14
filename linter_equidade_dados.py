@@ -1,98 +1,99 @@
+import os
 import sys
 import json
-import pandas as pd
 import time
+import importlib
 
-# --- Heurísticas implementadas ---
-def colunas_sem_nome(df):
-    return [col for col in df.columns if "Unnamed" in col]
+from pyspark.sql import SparkSession
 
-def colunas_vazias(df):
-    return [col for col in df.columns if df[col].isnull().all()]
+# ------------------------------------------------
+# Caminhos base
+# ------------------------------------------------
 
-def linhas_duplicadas(df):
-    return df[df.duplicated()].index.tolist()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PASTA_HEURISTICAS = os.path.join(BASE_DIR, "heuristicas")
+CONFIG_PATH = os.path.join(BASE_DIR, "heuristicas.config.json")
 
-def desequilibrio_categorias(df):
-    problemas = {}
-    for col in df.select_dtypes(include=["object", "category"]):
-        freq = df[col].value_counts(normalize=True)
-        if any(freq > 0.9):
-            problemas[col] = freq.to_dict()
-    return problemas
-
-def miscoding_numerico(df):
-    problemas = {}
-    for col in df.select_dtypes(include=["object"]):
-        try:
-            pd.to_numeric(df[col])
-        except ValueError:
-            problemas[col] = "valores não numéricos detectados"
-    return problemas
-
-def miscoding_caps(df):
-    problemas = {}
-    for col in df.select_dtypes(include=["object"]):
-        valores = df[col].dropna().unique()
-        for v in valores:
-            if str(v).lower() in [str(x).lower() for x in valores] and v not in ["", None]:
-                if any(str(v) != str(x) for x in valores):
-                    problemas[col] = "valores inconsistentes em maiúsculas/minúsculas"
-    return problemas
-
-def outliers(df):
-    problemas = {}
-    for col in df.select_dtypes(include=["number"]):
-        q1 = df[col].quantile(0.25)
-        q3 = df[col].quantile(0.75)
-        iqr = q3 - q1
-        limites = (q1 - 1.5 * iqr, q3 + 1.5 * iqr)
-        outliers = df[(df[col] < limites[0]) | (df[col] > limites[1])][col]
-        if not outliers.empty:
-            problemas[col] = outliers.tolist()
-    return problemas
+# Como agora o caminho não tem espaços, usar sys.executable puro é melhor
+os.environ["PYSPARK_PYTHON"] = sys.executable
+os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
 
 
-# --- Mapeamento de heurísticas ---
-HEURISTICAS = {
-    "colunas_sem_nome": colunas_sem_nome,
-    "colunas_vazias": colunas_vazias,
-    "linhas_duplicadas": linhas_duplicadas,
-    "desequilibrio_categorias": desequilibrio_categorias,
-    "miscoding_numerico": miscoding_numerico,
-    "miscoding_caps": miscoding_caps,
-    "outliers": outliers,
-}
+# ------------------------------------------------
+# Carregar heurísticas dinamicamente
+# ------------------------------------------------
 
+def carregar_heuristicas():
+    heuristicas = {}
+
+    if not os.path.exists(PASTA_HEURISTICAS):
+        return heuristicas
+
+    for arquivo in os.listdir(PASTA_HEURISTICAS):
+        if arquivo.endswith(".py") and not arquivo.startswith("__"):
+            nome = arquivo[:-3]
+
+            try:
+                modulo = importlib.import_module(f"heuristicas.{nome}")
+
+                if hasattr(modulo, "executar"):
+                    heuristicas[nome] = modulo.executar
+                else:
+                    print(f"A heurística '{nome}' não possui a função 'executar(df)'.")
+
+            except Exception as e:
+                print(f"Erro ao carregar heurística '{nome}': {e}")
+
+    return heuristicas
+
+
+# ------------------------------------------------
+# Resetar configuração
+# ------------------------------------------------
 
 def resetar_config():
-    """Restaura o arquivo heuristicas.config.json para o estado padrão."""
     estado_inicial = {
         "heuristicas": [],
         "arquivo_csv": None
     }
-    with open("heuristicas.config.json", "w", encoding="utf-8") as f:
+
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(estado_inicial, f, indent=4, ensure_ascii=False)
+
     print("Arquivo 'heuristicas.config.json' foi resetado para o estado inicial.\n")
 
 
-def main():
+# ------------------------------------------------
+# Main
+# ------------------------------------------------
 
+def main():
     inicio = time.time()
 
-    # --- Lê arquivo de configuração ---
+    # Carrega heurísticas disponíveis
+    heuristicas_disponiveis = carregar_heuristicas()
+
+    if not heuristicas_disponiveis:
+        print("Nenhuma heurística encontrada na pasta 'heuristicas'.")
+        sys.exit(1)
+
+    # ------------------------------------------------
+    # Lê configuração
+    # ------------------------------------------------
+
     try:
-        with open("heuristicas.config.json", "r", encoding="utf-8") as f:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
             config = json.load(f)
+
     except FileNotFoundError:
-        print("Arquivo 'heuristicas.config.json' não encontrado. Rode `node configurar-heuristicas.js` antes.")
+        print("Arquivo 'heuristicas.config.json' não encontrado.")
         sys.exit(1)
 
     heuristicas_escolhidas = config.get("heuristicas", [])
     arquivo_csv = config.get("arquivo_csv", None)
 
     if not arquivo_csv:
-        print("Nenhum arquivo CSV definido em heuristicas.config.json.")
+        print("Nenhum arquivo CSV definido.")
         sys.exit(1)
 
     if not heuristicas_escolhidas:
@@ -102,50 +103,117 @@ def main():
     print(f"Arquivo selecionado: {arquivo_csv}")
     print(f"Heurísticas que serão aplicadas: {', '.join(heuristicas_escolhidas)}\n")
 
-    # --- Lê o CSV ---
+    # ------------------------------------------------
+    # Criar Spark
+    # ------------------------------------------------
+
+    spark = (
+        SparkSession.builder
+        .appName("linter_equidade_dados_spark")
+        .master("local[*]")
+        .config("spark.sql.shuffle.partitions", "4")
+        .getOrCreate()
+    )
+
+    spark.sparkContext.setLogLevel("ERROR")
+
+    # ------------------------------------------------
+    # Ler CSV e cachear
+    # ------------------------------------------------
+
     try:
-        df = pd.read_csv(arquivo_csv, low_memory=False)
+        df = (
+            spark.read
+            .option("header", True)
+            .option("inferSchema", True)
+            .csv(arquivo_csv)
+            .cache()
+        )
+
+        # força materialização do cache
+        df.count()
+
     except Exception as e:
         print(f"Erro ao abrir '{arquivo_csv}': {e}")
+        spark.stop()
         sys.exit(1)
 
-    # --- Executa as heurísticas ---
+    # ------------------------------------------------
+    # Executar heurísticas
+    # ------------------------------------------------
+
     total_verificacoes = len(heuristicas_escolhidas)
-    erros = []
+    lints = []
+    falhas_execucao = []
 
     for nome in heuristicas_escolhidas:
-        func = HEURISTICAS.get(nome)
-        if func:
-            resultado = func(df)
-            if resultado:
-                erros.append((nome, resultado))
+        func = heuristicas_disponiveis.get(nome)
 
-    # --- Calcula estatísticas ---
-    percentual_erros = (len(erros) / total_verificacoes) * 100 if total_verificacoes else 0
-    percentual_corretos = 100 - percentual_erros
+        if not func:
+            falhas_execucao.append((nome, "Heurística não encontrada"))
+            continue
+
+        print(f"Executando heurística: {nome} ...")
+
+        try:
+            resultado = func(df)
+
+            if resultado:
+                lints.append((nome, resultado))
+
+        except Exception as e:
+            falhas_execucao.append((nome, f"Erro ao executar heurística: {e}"))
+
+    # ------------------------------------------------
+    # Estatísticas
+    # ------------------------------------------------
+
+    percentual_lints = (len(lints) / total_verificacoes) * 100 if total_verificacoes else 0
+    percentual_corretos = 100 - percentual_lints
 
     print(f"\nTotal de verificações: {total_verificacoes}")
-    print(f"Lints detectados: {len(erros)}")
-    print(f"Porcentagem de lints encontrados: {percentual_erros:.2f}%")
+    print(f"Lints detectados: {len(lints)}")
+    print(f"Falhas de execução: {len(falhas_execucao)}")
+    print(f"Porcentagem de lints encontrados: {percentual_lints:.2f}%")
     print(f"Porcentagem de dados corretos: {percentual_corretos:.2f}%\n")
 
-    # --- Exibe resultados ---
-    if erros:
+    # ------------------------------------------------
+    # Mostrar lints
+    # ------------------------------------------------
+
+    if lints:
         print("Heurísticas (Lints) encontradas:")
-        for categoria, erro in erros:
+
+        for categoria, erro in lints:
             print(f"  * [{categoria.upper()}] {erro}")
+
         print()
 
-    # --- Mostra tempo total de execução ---
+    # ------------------------------------------------
+    # Mostrar falhas de execução
+    # ------------------------------------------------
+
+    if falhas_execucao:
+        print("Falhas de execução:")
+
+        for categoria, erro in falhas_execucao:
+            print(f"  * [{categoria.upper()}] {erro}")
+
+        print()
+
+    # ------------------------------------------------
+    # Tempo
+    # ------------------------------------------------
+
     fim = time.time()
     duracao = fim - inicio
-    print(f"Tempo total de execução: {duracao:.2f} segundos\n")
-    
-    # --- Resetar configuração antes de sair ---
-    resetar_config()
 
-    # --- Sair com código apropriado ---
-    if erros:
+    print(f"Tempo total de execução: {duracao:.2f} segundos\n")
+
+    resetar_config()
+    spark.stop()
+
+    if lints or falhas_execucao:
         sys.exit(1)
     else:
         print("Nenhum erro identificado com as heurísticas aplicadas.\n")

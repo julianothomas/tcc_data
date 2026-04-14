@@ -1,6 +1,4 @@
 {
-  "arquivo_csv": "D:\\faculdade\\tcc\\husky\\data\\dados.csv",
-  "heuristicas": [
-    "colunas_sem_nome"
-  ]
+    "heuristicas": [],
+    "arquivo_csv": null
 }
