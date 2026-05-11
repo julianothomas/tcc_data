@@ -2,13 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
-// ------------------------------------------------
-// Caminhos base (robustos)
-// ------------------------------------------------
+const BASE_DIR = __dirname;
 
-const pastaHeuristicas = path.join(__dirname, 'heuristicas');
-const pastaCSV = path.join(__dirname, 'data');
-const caminhoConfig = path.join(__dirname, 'heuristicas.config.json');
+const pastaHeuristicas = path.join(BASE_DIR, 'heuristicas');
+const pastaDataPadrao = path.join(BASE_DIR, 'data');
+
+const CONFIG_PATH = path.join(BASE_DIR, 'heuristicas.config.json');
+
+const FORMATOS_SUPORTADOS = ['.csv', '.parquet'];
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -17,9 +18,8 @@ const rl = readline.createInterface({
 
 console.log("CONFIGURAÇÃO DE HEURÍSTICAS");
 
-
 // ------------------------------------------------
-// CARREGAR HEURÍSTICAS DINAMICAMENTE
+// CARREGAR HEURÍSTICAS
 // ------------------------------------------------
 
 let heuristicas = {};
@@ -32,128 +32,235 @@ try {
     .filter(f => f.endsWith('.py') && !f.startsWith('__'))
     .map(f => f.replace('.py', ''));
 
-  if (listaHeuristicas.length === 0) {
-    console.log("Nenhuma heurística encontrada na pasta 'heuristicas/'.");
-    rl.close();
-    process.exit(1);
-  }
-
   listaHeuristicas.forEach((h, i) => {
     heuristicas[(i + 1).toString()] = h;
   });
 
-} catch (err) {
+} catch {
 
-  console.log(`Erro ao acessar pasta de heurísticas: ${err.message}`);
+  console.log(`Pasta '${pastaHeuristicas}' não encontrada.`);
   rl.close();
   process.exit(1);
 
 }
-
 
 // ------------------------------------------------
-// LISTAR CSVs
+// ESCOLHER ORIGEM DOS DADOS
 // ------------------------------------------------
 
-let arquivosCSV = [];
+console.log("\nORIGEM DOS DADOS:");
+console.log("1. Apenas pasta padrão ./data");
+console.log("2. Outra pasta");
+console.log("3. Pasta ./data + outra pasta");
 
-try {
+rl.question("\nEscolha uma opção: ", (opcao) => {
 
-  arquivosCSV = fs
-    .readdirSync(pastaCSV)
-    .filter(f => f.endsWith('.csv'));
+  let pastasDados = [];
 
-} catch (err) {
+  // ------------------------------------------------
+  // OPÇÃO 1
+  // ------------------------------------------------
 
-  console.log(`Erro ao acessar pasta 'data/': ${err.message}`);
-  rl.close();
-  process.exit(1);
+  if (opcao.trim() === "1") {
 
-}
+    pastasDados.push(pastaDataPadrao);
 
-if (arquivosCSV.length === 0) {
+    carregarArquivosDados(pastasDados);
 
-  console.log("Nenhum arquivo CSV encontrado na pasta 'data/'.");
-  rl.close();
-  process.exit(1);
+  }
 
-}
+  // ------------------------------------------------
+  // OPÇÃO 2
+  // ------------------------------------------------
 
-console.log("\nARQUIVOS DISPONÍVEIS:");
+  else if (opcao.trim() === "2") {
 
-arquivosCSV.forEach((f, i) => {
-  console.log(`${i + 1}. ${f}`);
+    rl.question("\nDigite o caminho da pasta contendo os dados: ", (pastaExtra) => {
+
+      if (!fs.existsSync(pastaExtra)) {
+
+        console.log("Pasta não encontrada.");
+        rl.close();
+        return;
+
+      }
+
+      pastasDados.push(pastaExtra);
+
+      carregarArquivosDados(pastasDados);
+
+    });
+
+  }
+
+  // ------------------------------------------------
+  // OPÇÃO 3
+  // ------------------------------------------------
+
+  else if (opcao.trim() === "3") {
+
+    rl.question("\nDigite o caminho da pasta extra: ", (pastaExtra) => {
+
+      if (!fs.existsSync(pastaExtra)) {
+
+        console.log("Pasta não encontrada.");
+        rl.close();
+        return;
+
+      }
+
+      pastasDados.push(pastaDataPadrao);
+      pastasDados.push(pastaExtra);
+
+      carregarArquivosDados(pastasDados);
+
+    });
+
+  }
+
+  else {
+
+    console.log("Opção inválida.");
+    rl.close();
+
+  }
+
 });
 
-
 // ------------------------------------------------
-// ESCOLHER CSV
+// CARREGAR ARQUIVOS DE DADOS
 // ------------------------------------------------
 
-rl.question("\nDigite o número do arquivo CSV que deseja validar: ", (inputArquivo) => {
+function carregarArquivosDados(pastasDados) {
 
-  const indexArquivo = parseInt(inputArquivo.trim(), 10) - 1;
-  const arquivoSelecionado = arquivosCSV[indexArquivo];
+  let arquivosDados = [];
 
-  if (!arquivoSelecionado) {
-    console.log("Seleção inválida.");
-    rl.close();
-    return;
-  }
-
-  console.log("\nSELECIONE AS HEURÍSTICAS:");
-
-  for (const [num, nome] of Object.entries(heuristicas)) {
-    console.log(`${num}. ${nome}`);
-  }
-
-  rl.question("\nDigite os números separados por vírgula (ex: 1,3,5): ", (inputHeuristicas) => {
-
-    const selecionadas = inputHeuristicas
-      .split(',')
-      .map(i => heuristicas[i.trim()])
-      .filter(Boolean);
-
-    if (selecionadas.length === 0) {
-      console.log("Nenhuma heurística válida selecionada.");
-      rl.close();
-      return;
-    }
-
-    // ------------------------------------------------
-    // Criar configuração
-    // ------------------------------------------------
-
-    const configuracao = {
-      arquivo_csv: path.join(pastaCSV, arquivoSelecionado),
-      heuristicas: selecionadas
-    };
-
-    // ------------------------------------------------
-    // Salvar JSON no local correto
-    // ------------------------------------------------
+  for (const pasta of pastasDados) {
 
     try {
 
-      fs.writeFileSync(
-        caminhoConfig,
-        JSON.stringify(configuracao, null, 2)
-      );
+      const encontrados = fs
+        .readdirSync(pasta)
+        .filter(f =>
+          FORMATOS_SUPORTADOS.includes(path.extname(f).toLowerCase())
+        )
+        .map(f => ({
+          nome: f,
+          caminho: path.join(pasta, f)
+        }));
 
-    } catch (err) {
+      arquivosDados.push(...encontrados);
 
-      console.log(`Erro ao salvar configuração: ${err.message}`);
-      rl.close();
-      return;
+    } catch {
+
+      console.log(`Erro ao acessar pasta: ${pasta}`);
 
     }
 
-    console.log("\nPreferências salvas em 'heuristicas.config.json':");
-    console.log(`Arquivo selecionado: ${arquivoSelecionado}`);
-    console.log(`Heurísticas: ${selecionadas.join(', ')}`);
+  }
 
+  if (arquivosDados.length === 0) {
+
+    console.log("Nenhum arquivo de dados encontrado.");
     rl.close();
+    return;
 
+  }
+
+  // ------------------------------------------------
+  // LISTAR ARQUIVOS
+  // ------------------------------------------------
+
+  console.log("\nARQUIVOS DE DADOS ENCONTRADOS:");
+
+  arquivosDados.forEach((f, i) => {
+    console.log(`${i + 1}. ${f.nome}`);
   });
 
-});
+  // ------------------------------------------------
+  // ESCOLHER ARQUIVOS
+  // ------------------------------------------------
+
+  rl.question(
+    "\nDigite os números dos arquivos separados por vírgula (ex: 1,3,5): ",
+    (inputArquivos) => {
+
+      const selecionados = inputArquivos
+        .split(',')
+        .map(i => arquivosDados[parseInt(i.trim(), 10) - 1])
+        .filter(Boolean);
+
+      if (selecionados.length === 0) {
+
+        console.log("Nenhum arquivo válido selecionado.");
+        rl.close();
+        return;
+
+      }
+
+      // ------------------------------------------------
+      // LISTAR HEURÍSTICAS
+      // ------------------------------------------------
+
+      console.log("\nSELECIONE AS HEURÍSTICAS:");
+
+      for (const [num, nome] of Object.entries(heuristicas)) {
+
+        console.log(`${num}. ${nome}`);
+
+      }
+
+      rl.question(
+        "\nDigite os números separados por vírgula (ex: 1,3,5): ",
+        (inputHeuristicas) => {
+
+          const selecionadas = inputHeuristicas
+            .split(',')
+            .map(i => heuristicas[i.trim()])
+            .filter(Boolean);
+
+          if (selecionadas.length === 0) {
+
+            console.log("Nenhuma heurística válida selecionada.");
+            rl.close();
+            return;
+
+          }
+
+          // ------------------------------------------------
+          // SALVAR CONFIGURAÇÃO
+          // ------------------------------------------------
+
+          const configuracao = {
+
+            arquivos_dados: selecionados.map(a => a.caminho),
+            heuristicas: selecionadas
+
+          };
+
+          fs.writeFileSync(
+            CONFIG_PATH,
+            JSON.stringify(configuracao, null, 2)
+          );
+
+          console.log("\nPreferências salvas em 'heuristicas.config.json':");
+
+          console.log("\nArquivos selecionados:");
+
+          selecionados.forEach(a => {
+            console.log(`- ${a.nome}`);
+          });
+
+          console.log(`\nHeurísticas: ${selecionadas.join(', ')}`);
+
+          rl.close();
+
+        }
+
+      );
+
+    }
+
+  );
+
+}
