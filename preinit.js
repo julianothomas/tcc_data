@@ -29,7 +29,7 @@ try {
 
   listaHeuristicas = fs
     .readdirSync(pastaHeuristicas)
-    .filter(f => f.endsWith('.py') && !f.startsWith('__'))
+    .filter(f => f.endsWith('.py') && !f.startsWith('__') && !f.startsWith('utils_'))
     .map(f => f.replace('.py', ''));
 
   listaHeuristicas.forEach((h, i) => {

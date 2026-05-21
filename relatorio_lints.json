@@ -1,0 +1,95 @@
+{
+    "tempo_total_segundos": 20.97,
+    "total_resultados": 8,
+    "total_ok": 7,
+    "total_lints": 1,
+    "total_erros": 0,
+    "resultados": [
+        {
+            "codigo": "DL001",
+            "heuristica": "colunas_sem_nome",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma coluna sem nome encontrada.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        },
+        {
+            "codigo": "DL002",
+            "heuristica": "colunas_vazias",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma coluna totalmente vazia encontrada.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma categoria dominante encontrada.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        },
+        {
+            "codigo": "DL004",
+            "heuristica": "linhas_duplicadas",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma linha duplicada encontrada.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        },
+        {
+            "codigo": "DL005",
+            "heuristica": "miscoding_caps",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma inconsistência de maiúsculas/minúsculas encontrada.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        },
+        {
+            "codigo": "DL006",
+            "heuristica": "miscoding_numerico",
+            "status": "LINT",
+            "coluna": "PR Number",
+            "ocorrencias": 125,
+            "amostra": [
+                " {'component': 'PR_AGI-Alpha-Agent-v0_2494:tests/resources/sentence_transformers.py'",
+                " 'effort': '12min'",
+                " 'effort': '8min'",
+                " 'effort': '6min'",
+                " 'effort': '5min'"
+            ],
+            "mensagem": "Coluna textual com maioria de valores numéricos, mas contendo valores não numéricos.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        },
+        {
+            "codigo": "DL007",
+            "heuristica": "outliers",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhum outlier encontrado nas colunas numéricas.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        },
+        {
+            "codigo": "DL008",
+            "heuristica": "valores_negativos",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhum valor negativo encontrado.",
+            "arquivo": "D:\\faculdade\\tcc\\dataset\\MSR-Mining-2026-Replication\\dataset\\All_PR_Sonar_Results.csv"
+        }
+    ]
+}

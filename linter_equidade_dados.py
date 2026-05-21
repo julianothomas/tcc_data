@@ -40,7 +40,7 @@ def carregar_heuristicas():
 
     for arquivo in os.listdir(PASTA_HEURISTICAS):
 
-        if arquivo.endswith(".py") and not arquivo.startswith("__"):
+        if (arquivo.endswith(".py") and not arquivo.startswith("__") and not arquivo.startswith("utils_")):
 
             nome = arquivo[:-3]
 
@@ -234,8 +234,7 @@ def executar_heuristicas(
     arquivo_dados,
     heuristicas_escolhidas,
     heuristicas_disponiveis,
-    lints,
-    falhas_execucao
+    resultados_lint
 ):
 
     for nome in heuristicas_escolhidas:
@@ -244,15 +243,16 @@ def executar_heuristicas(
 
         if not func:
 
-            falhas_execucao.append(
-
-                (
-                    arquivo_dados,
-                    nome,
-                    "Heurística não encontrada"
-                )
-
-            )
+            resultados_lint.append({
+                "arquivo": arquivo_dados,
+                "codigo": "DL000",
+                "heuristica": nome,
+                "status": "ERRO",
+                "coluna": None,
+                "ocorrencias": 0,
+                "amostra": [],
+                "mensagem": "Heurística não encontrada."
+            })
 
             continue
 
@@ -260,127 +260,124 @@ def executar_heuristicas(
 
         try:
 
-            resultado = func(df)
+            resultados = func(df)
 
-            if resultado:
+            for resultado in resultados:
 
-                lints.append(
-
-                    (
-                        arquivo_dados,
-                        nome,
-                        resultado
-                    )
-
-                )
+                resultado["arquivo"] = arquivo_dados
+                resultados_lint.append(resultado)
 
         except Exception as e:
 
-            falhas_execucao.append(
-
-                (
-                    arquivo_dados,
-                    nome,
-                    f"Erro ao executar heurística: {e}"
-                )
-
-            )
+            resultados_lint.append({
+                "arquivo": arquivo_dados,
+                "codigo": "DL000",
+                "heuristica": nome,
+                "status": "ERRO",
+                "coluna": None,
+                "ocorrencias": 0,
+                "amostra": [],
+                "mensagem": f"Erro ao executar heurística: {e}"
+            })
 
 
 # ------------------------------------------------
 # MOSTRAR RELATÓRIO
 # ------------------------------------------------
 
-def mostrar_relatorio(
-    total_verificacoes,
-    arquivos_dados,
-    lints,
-    falhas_execucao,
-    tempo_total
-):
+def salvar_relatorio_json(resultados_lint, tempo_total):
 
-    percentual_lints = (
+    relatorio = {
+        "tempo_total_segundos": round(tempo_total, 2),
+        "total_resultados": len(resultados_lint),
+        "total_ok": len([r for r in resultados_lint if r.get("status") == "OK"]),
+        "total_lints": len([r for r in resultados_lint if r.get("status") == "LINT"]),
+        "total_erros": len([r for r in resultados_lint if r.get("status") == "ERRO"]),
+        "resultados": resultados_lint
+    }
 
-        (len(lints) / total_verificacoes) * 100
-
-        if total_verificacoes else 0
-
+    caminho_relatorio = os.path.join(
+        BASE_DIR,
+        "relatorio_lints.json"
     )
 
-    percentual_corretos = 100 - percentual_lints
+    with open(caminho_relatorio, "w", encoding="utf-8") as f:
+        json.dump(relatorio, f, indent=4, ensure_ascii=False, default=str)
 
-    print(f"\nTotal de verificações: {total_verificacoes}")
+    print(f"\nRelatório completo salvo em: {caminho_relatorio}")
 
-    print(
-        f"Arquivos analisados: "
-        f"{len(arquivos_dados)}"
-    )
 
-    print(f"Lints detectados: {len(lints)}")
+def mostrar_relatorio(resultados_lint, tempo_total):
 
-    print(
-        f"Falhas de execução: "
-        f"{len(falhas_execucao)}"
-    )
+    lints = [r for r in resultados_lint if r.get("status") == "LINT"]
+    erros = [r for r in resultados_lint if r.get("status") == "ERRO"]
+    oks = [r for r in resultados_lint if r.get("status") == "OK"]
 
-    print(
-        f"Porcentagem de lints encontrados: "
-        f"{percentual_lints:.2f}%"
-    )
+    print("\n" + "=" * 70)
+    print("RELATÓRIO DO DATA LINTER")
+    print("=" * 70)
 
-    print(
-        f"Porcentagem de dados corretos: "
-        f"{percentual_corretos:.2f}%\n"
-    )
+    print(f"OK: {len(oks)} | LINTS: {len(lints)} | ERROS: {len(erros)}")
+    print(f"Tempo total: {tempo_total:.2f} segundos\n")
 
-    # --------------------------------------------
-    # MOSTRAR LINTS
-    # --------------------------------------------
+    print("ARQUIVO | CÓDIGO | STATUS | DESCRIÇÃO")
+    print("-" * 70)
 
-    if lints:
+    for r in resultados_lint:
 
-        print("Heurísticas (Lints) encontradas:")
+        arquivo = os.path.basename(
+            r.get("arquivo", "arquivo_desconhecido")
+        )
 
-        for arquivo, categoria, erro in lints:
+        codigo = r.get("codigo", "DL???")
+        status = r.get("status", "INDEFINIDO")
 
-            print(
-                f"  * Arquivo: "
-                f"{os.path.basename(arquivo)}"
-            )
+        coluna = r.get("coluna")
+        mensagem = r.get("mensagem", "")
 
-            print(
-                f"    [{categoria.upper()}] "
-                f"{erro}"
-            )
+        # ----------------------------------------
+        # Compactar mensagens
+        # ----------------------------------------
 
-        print()
+        mensagem = mensagem.replace(
+            "Categoria dominante detectada: ",
+            ""
+        )
 
-    # --------------------------------------------
-    # MOSTRAR FALHAS
-    # --------------------------------------------
+        mensagem = mensagem.replace(
+            "representa",
+            "="
+        )
 
-    if falhas_execucao:
+        mensagem = mensagem.replace(
+            "dos registros.",
+            ""
+        )
 
-        print("Falhas de execução:")
+        mensagem = mensagem.replace(
+            "Coluna totalmente vazia.",
+            "coluna totalmente vazia"
+        )
 
-        for arquivo, categoria, erro in falhas_execucao:
+        # ----------------------------------------
+        # Mensagem final
+        # ----------------------------------------
 
-            print(
-                f"  * Arquivo: "
-                f"{os.path.basename(arquivo)}"
-            )
+        if coluna:
+            descricao = f"{coluna} {mensagem}"
+        else:
+            descricao = mensagem
 
-            print(
-                f"    [{categoria.upper()}] "
-                f"{erro}"
-            )
+        print(
+            f"{arquivo} | "
+            f"{codigo} | "
+            f"{status} | "
+            f"{descricao}"
+        )
 
-        print()
+    print("=" * 70)
 
-    print(
-        f"Tempo total de execução: "
-        f"{tempo_total:.2f} segundos\n"
-    )
+    salvar_relatorio_json(resultados_lint, tempo_total)
 
 
 # ------------------------------------------------
@@ -442,17 +439,7 @@ def main():
 
     spark = criar_spark()
 
-    total_verificacoes = (
-
-        len(heuristicas_escolhidas)
-
-        * len(arquivos_dados)
-
-    )
-
-    lints = []
-
-    falhas_execucao = []
+    resultados_lint = []
 
     # --------------------------------------------
     # VALIDAR ARQUIVOS
@@ -461,10 +448,8 @@ def main():
     for arquivo_dados in arquivos_dados:
 
         print(
-
             f"\nValidando arquivo: "
             f"{os.path.basename(arquivo_dados)}"
-
         )
 
         try:
@@ -476,27 +461,25 @@ def main():
 
         except Exception as e:
 
-            falhas_execucao.append(
-
-                (
-                    arquivo_dados,
-                    "leitura_arquivo",
-                    f"Erro ao abrir arquivo: {e}"
-                )
-
-            )
+            resultados_lint.append({
+                "arquivo": arquivo_dados,
+                "codigo": "DL000",
+                "heuristica": "leitura_arquivo",
+                "status": "ERRO",
+                "coluna": None,
+                "ocorrencias": 0,
+                "amostra": [],
+                "mensagem": f"Erro ao abrir arquivo: {e}"
+            })
 
             continue
 
         executar_heuristicas(
-
             df,
             arquivo_dados,
             heuristicas_escolhidas,
             heuristicas_disponiveis,
-            lints,
-            falhas_execucao
-
+            resultados_lint
         )
 
     # --------------------------------------------
@@ -504,30 +487,22 @@ def main():
     # --------------------------------------------
 
     mostrar_relatorio(
-
-        total_verificacoes,
-        arquivos_dados,
-        lints,
-        falhas_execucao,
+        resultados_lint,
         time.time() - inicio
-
     )
 
     resetar_config()
 
     spark.stop()
 
-    if lints or falhas_execucao:
-
+    if any(r["status"] in ("LINT", "ERRO") for r in resultados_lint):
         sys.exit(1)
 
     else:
-
         print(
             "Nenhum erro identificado "
             "com as heurísticas aplicadas.\n"
         )
-
         sys.exit(0)
 
 
