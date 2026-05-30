@@ -1,7 +1,7 @@
 {
-    "tempo_total_segundos": 7.82,
-    "total_resultados": 3,
-    "total_ok": 3,
+    "tempo_total_segundos": 6.56,
+    "total_resultados": 1,
+    "total_ok": 1,
     "total_lints": 0,
     "total_erros": 0,
     "resultados": [
@@ -13,27 +13,7 @@
             "ocorrencias": 0,
             "amostra": [],
             "mensagem": "Nenhuma coluna sem nome encontrada.",
-            "arquivo": "D:\\faculdade\\tcc\\husky\\data\\dados_com_erros.csv"
-        },
-        {
-            "codigo": "DL002",
-            "heuristica": "colunas_vazias",
-            "status": "OK",
-            "coluna": null,
-            "ocorrencias": 0,
-            "amostra": [],
-            "mensagem": "Nenhuma coluna totalmente vazia encontrada.",
-            "arquivo": "D:\\faculdade\\tcc\\husky\\data\\dados_com_erros.csv"
-        },
-        {
-            "codigo": "DL003",
-            "heuristica": "desequilibrio_categorias",
-            "status": "OK",
-            "coluna": null,
-            "ocorrencias": 0,
-            "amostra": [],
-            "mensagem": "Nenhuma categoria dominante encontrada.",
-            "arquivo": "D:\\faculdade\\tcc\\husky\\data\\dados_com_erros.csv"
+            "arquivo": "D:\\faculdade\\tcc\\husky\\data\\dados_sem_erros.csv"
         }
     ]
 }

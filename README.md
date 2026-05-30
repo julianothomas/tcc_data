@@ -153,7 +153,7 @@ Etapas em andamento:
 
 ## Autor
 
-**Juliano Thomas**
+**Juliano Abi Thomas**
 
 Trabalho de Conclusão de Curso – Engenharia da Computação
 Universidade Federal de Mato Grosso do Sul (UFMS)
