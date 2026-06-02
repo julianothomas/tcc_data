@@ -75,17 +75,25 @@ rl.question("\nEscolha uma opção: ", (opcao) => {
 
   else if (opcao.trim() === "2") {
 
-    rl.question("\nDigite o caminho da pasta contendo os dados: ", (pastaExtra) => {
+    rl.question("\nDigite os caminhos das pastas contendo os dados, separados por vírgula: ", (entradaPastas) => {
 
-      if (!fs.existsSync(pastaExtra)) {
+      const pastasExtras = entradaPastas
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
 
-        console.log("Pasta não encontrada.");
+      const pastasInvalidas = pastasExtras.filter(p => !fs.existsSync(p));
+      
+      if (pastasInvalidas.length > 0) {
+
+        console.log("\nAs seguintes pastas não foram encontradas:");
+        pastasInvalidas.forEach(p => console.log(`- ${p}`));
         rl.close();
         return;
 
       }
 
-      pastasDados.push(pastaExtra);
+      pastasDados.push(...pastasExtras);
 
       carregarArquivosDados(pastasDados);
 
@@ -99,18 +107,26 @@ rl.question("\nEscolha uma opção: ", (opcao) => {
 
   else if (opcao.trim() === "3") {
 
-    rl.question("\nDigite o caminho da pasta extra: ", (pastaExtra) => {
+    rl.question("\nDigite os caminhos das pastas extras, separados por vírgula: ", (entradaPastas) => {
 
-      if (!fs.existsSync(pastaExtra)) {
+      const pastasExtras = entradaPastas
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
 
-        console.log("Pasta não encontrada.");
+      const pastasInvalidas = pastasExtras.filter(p => !fs.existsSync(p));
+      
+      if (pastasInvalidas.length > 0) {
+
+        console.log("\nAs seguintes pastas não foram encontradas:");
+        pastasInvalidas.forEach(p => console.log(`- ${p}`));
         rl.close();
         return;
 
       }
 
       pastasDados.push(pastaDataPadrao);
-      pastasDados.push(pastaExtra);
+      pastasDados.push(...pastasExtras);
 
       carregarArquivosDados(pastasDados);
 
@@ -174,7 +190,7 @@ function carregarArquivosDados(pastasDados) {
   console.log("\nARQUIVOS DE DADOS ENCONTRADOS:");
 
   arquivosDados.forEach((f, i) => {
-    console.log(`${i + 1}. ${f.nome}`);
+    console.log(`${i + 1}. ${f.nome} (${path.dirname(f.caminho)})`);
   });
 
   // ------------------------------------------------
@@ -248,7 +264,7 @@ function carregarArquivosDados(pastasDados) {
           console.log("\nArquivos selecionados:");
 
           selecionados.forEach(a => {
-            console.log(`- ${a.nome}`);
+            console.log(`- ${a.nome} (${path.dirname(a.caminho)})`);
           });
 
           console.log(`\nHeurísticas: ${selecionadas.join(', ')}`);

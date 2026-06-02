@@ -232,6 +232,8 @@ def carregar_dataframe(spark, arquivo_dados):
 def executar_heuristicas(
     df,
     arquivo_dados,
+    nome_dataset,
+    nome_arquivo,
     heuristicas_escolhidas,
     heuristicas_disponiveis,
     resultados_lint
@@ -244,7 +246,9 @@ def executar_heuristicas(
         if not func:
 
             resultados_lint.append({
-                "arquivo": arquivo_dados,
+                "dataset": nome_dataset,
+                "nome_arquivo": nome_arquivo,
+                "caminho": arquivo_dados,
                 "codigo": "DL000",
                 "heuristica": nome,
                 "status": "ERRO",
@@ -264,13 +268,18 @@ def executar_heuristicas(
 
             for resultado in resultados:
 
-                resultado["arquivo"] = arquivo_dados
+                resultado["dataset"] = nome_dataset
+                resultado["nome_arquivo"] = nome_arquivo
+                resultado["caminho"] = arquivo_dados
+
                 resultados_lint.append(resultado)
 
         except Exception as e:
 
             resultados_lint.append({
-                "arquivo": arquivo_dados,
+                "dataset": nome_dataset,
+                "nome_arquivo": nome_arquivo,
+                "caminho": arquivo_dados,
                 "codigo": "DL000",
                 "heuristica": nome,
                 "status": "ERRO",
@@ -320,14 +329,13 @@ def mostrar_relatorio(resultados_lint, tempo_total):
     print(f"OK: {len(oks)} | LINTS: {len(lints)} | ERROS: {len(erros)}")
     print(f"Tempo total: {tempo_total:.2f} segundos\n")
 
-    print("ARQUIVO | CÓDIGO | STATUS | DESCRIÇÃO")
+    print("DATASET | ARQUIVO | CÓDIGO | STATUS | DESCRIÇÃO")
     print("-" * 70)
 
     for r in resultados_lint:
 
-        arquivo = os.path.basename(
-            r.get("arquivo", "arquivo_desconhecido")
-        )
+        arquivo = r.get("nome_arquivo", "arquivo_desconhecido")
+        dataset = r.get("dataset", "dataset_desconhecido")
 
         codigo = r.get("codigo", "DL???")
         status = r.get("status", "INDEFINIDO")
@@ -369,6 +377,7 @@ def mostrar_relatorio(resultados_lint, tempo_total):
             descricao = mensagem
 
         print(
+            f"{dataset} | "
             f"{arquivo} | "
             f"{codigo} | "
             f"{status} | "
@@ -447,10 +456,14 @@ def main():
 
     for arquivo_dados in arquivos_dados:
 
-        print(
-            f"\nValidando arquivo: "
-            f"{os.path.basename(arquivo_dados)}"
-        )
+        nome_arquivo = os.path.basename(arquivo_dados)
+
+        nome_dataset = os.path.basename(os.path.dirname(arquivo_dados))
+        
+        print("\n" + "-" * 70)
+        print(f"Dataset : {nome_dataset}")
+        print(f"Arquivo : {nome_arquivo}")
+        print("-" * 70)
 
         try:
 
@@ -462,7 +475,9 @@ def main():
         except Exception as e:
 
             resultados_lint.append({
-                "arquivo": arquivo_dados,
+                "dataset": nome_dataset,
+                "nome_arquivo": nome_arquivo,
+                "caminho": arquivo_dados,
                 "codigo": "DL000",
                 "heuristica": "leitura_arquivo",
                 "status": "ERRO",
@@ -477,6 +492,8 @@ def main():
         executar_heuristicas(
             df,
             arquivo_dados,
+            nome_dataset,
+            nome_arquivo,
             heuristicas_escolhidas,
             heuristicas_disponiveis,
             resultados_lint

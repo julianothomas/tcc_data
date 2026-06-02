@@ -1,7 +1,7 @@
 {
-    "tempo_total_segundos": 6.56,
-    "total_resultados": 1,
-    "total_ok": 1,
+    "tempo_total_segundos": 20.49,
+    "total_resultados": 3,
+    "total_ok": 3,
     "total_lints": 0,
     "total_erros": 0,
     "resultados": [
@@ -13,7 +13,33 @@
             "ocorrencias": 0,
             "amostra": [],
             "mensagem": "Nenhuma coluna sem nome encontrada.",
-            "arquivo": "D:\\faculdade\\tcc\\husky\\data\\dados_sem_erros.csv"
+            "dataset": "1 - Tabular Playground Series - Dec 2021",
+            "nome_arquivo": "sample_submission.csv",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\Datasets MLE-Bench\\1 - Tabular Playground Series - Dec 2021\\sample_submission.csv"
+        },
+        {
+            "codigo": "DL001",
+            "heuristica": "colunas_sem_nome",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma coluna sem nome encontrada.",
+            "dataset": "1 - Tabular Playground Series - Dec 2021",
+            "nome_arquivo": "test.csv",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\Datasets MLE-Bench\\1 - Tabular Playground Series - Dec 2021\\test.csv"
+        },
+        {
+            "codigo": "DL001",
+            "heuristica": "colunas_sem_nome",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma coluna sem nome encontrada.",
+            "dataset": "1 - Tabular Playground Series - Dec 2021",
+            "nome_arquivo": "train.csv",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\Datasets MLE-Bench\\1 - Tabular Playground Series - Dec 2021\\train.csv"
         }
     ]
 }
