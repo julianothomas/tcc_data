@@ -109,7 +109,7 @@ def criar_spark():
 
         SparkSession.builder
 
-        .appName("linter_equidade_dados_spark")
+        .appName("linter_dados_spark")
 
         .master("local[*]")
 
