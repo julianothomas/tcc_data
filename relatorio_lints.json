@@ -1,5 +1,5 @@
 {
-    "tempo_total_segundos": 8.66,
+    "tempo_total_segundos": 8.43,
     "total_resultados": 1,
     "total_ok": 1,
     "total_lints": 0,
@@ -14,8 +14,8 @@
             "amostra": [],
             "mensagem": "Nenhuma coluna sem nome encontrada.",
             "dataset": "data",
-            "nome_arquivo": "dados.csv",
-            "caminho": "D:\\faculdade\\tcc\\husky\\data\\dados.csv"
+            "nome_arquivo": "dados_sem_erros.csv",
+            "caminho": "D:\\faculdade\\tcc\\husky\\data\\dados_sem_erros.csv"
         }
     ]
 }

@@ -1,6 +1,6 @@
 # Data Linter para Qualidade de Dados
 
-Uma proposta de **Data Linter** para validação automatizada de datasets, desenvolvida como Trabalho de Conclusão de Curso (TCC). A ferramenta realiza verificações de qualidade e qualidade de dados utilizando heurísticas inspiradas no artigo *The Data Linter* (Hynes et al., 2017), integradas a um fluxo automatizado baseado em **Git Hooks**, **Husky**, **Python** e **PySpark**.
+Uma proposta de **Data Linter** para validação automatizada de datasets, desenvolvida como Trabalho de Conclusão de Curso (TCC). A ferramenta realiza verificações de qualidade de dados utilizando heurísticas inspiradas no artigo *The Data Linter* (Hynes et al., 2017), integradas a um fluxo automatizado baseado em **Git Hooks**, **Husky**, **Python** e **PySpark**.
 
 ## Objetivo
 
@@ -117,7 +117,7 @@ Relatório de inconsistências
 * Arquitetura extensível semelhante a plugins.
 * Compatibilidade com ambientes de Big Data.
 * Suporte a processamento distribuído.
-* Foco em qualidade e qualidade dos dados.
+* Foco em qualidade dos dados.
 
 ## Trabalhos Relacionados
 
