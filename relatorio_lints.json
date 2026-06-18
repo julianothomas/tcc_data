@@ -1,8 +1,8 @@
 {
-    "tempo_total_segundos": 8.43,
-    "total_resultados": 1,
-    "total_ok": 1,
-    "total_lints": 0,
+    "tempo_total_segundos": 178.06,
+    "total_resultados": 27,
+    "total_ok": 4,
+    "total_lints": 23,
     "total_erros": 0,
     "resultados": [
         {
@@ -13,9 +13,387 @@
             "ocorrencias": 0,
             "amostra": [],
             "mensagem": "Nenhuma coluna sem nome encontrada.",
-            "dataset": "data",
-            "nome_arquivo": "dados_sem_erros.csv",
-            "caminho": "D:\\faculdade\\tcc\\husky\\data\\dados_sem_erros.csv"
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL002",
+            "heuristica": "colunas_vazias",
+            "status": "LINT",
+            "coluna": "mirror_url",
+            "ocorrencias": 50000,
+            "amostra": [
+                null
+            ],
+            "mensagem": "Coluna totalmente vazia.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "manual_annotation",
+            "ocorrencias": 49667,
+            "amostra": [
+                null
+            ],
+            "mensagem": "Categoria dominante detectada: 'None' representa 99.33% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "private",
+            "ocorrencias": 50000,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 100.00% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "fork",
+            "ocorrencias": 50000,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 100.00% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "has_issues",
+            "ocorrencias": 49052,
+            "amostra": [
+                true
+            ],
+            "mensagem": "Categoria dominante detectada: 'True' representa 98.10% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "has_projects",
+            "ocorrencias": 49487,
+            "amostra": [
+                true
+            ],
+            "mensagem": "Categoria dominante detectada: 'True' representa 98.97% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "has_downloads",
+            "ocorrencias": 49979,
+            "amostra": [
+                true
+            ],
+            "mensagem": "Categoria dominante detectada: 'True' representa 99.96% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "has_wiki",
+            "ocorrencias": 46840,
+            "amostra": [
+                true
+            ],
+            "mensagem": "Categoria dominante detectada: 'True' representa 93.68% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "has_pages",
+            "ocorrencias": 47612,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 95.22% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "has_discussions",
+            "ocorrencias": 49704,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 99.41% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "archived",
+            "ocorrencias": 48983,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 97.97% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "disabled",
+            "ocorrencias": 50000,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 100.00% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "allow_forking",
+            "ocorrencias": 50000,
+            "amostra": [
+                true
+            ],
+            "mensagem": "Categoria dominante detectada: 'True' representa 100.00% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "is_template",
+            "ocorrencias": 49843,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 99.69% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "web_commit_signoff_required",
+            "ocorrencias": 49920,
+            "amostra": [
+                false
+            ],
+            "mensagem": "Categoria dominante detectada: 'False' representa 99.84% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "visibility",
+            "ocorrencias": 50000,
+            "amostra": [
+                "public"
+            ],
+            "mensagem": "Categoria dominante detectada: 'public' representa 100.00% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "permissions",
+            "ocorrencias": 50000,
+            "amostra": [
+                "{'admin': False, 'maintain': False, 'push': False, 'triage': False, 'pull': True}"
+            ],
+            "mensagem": "Categoria dominante detectada: '{'admin': False, 'maintain': False, 'push': False, 'triage': False, 'pull': True}' representa 100.00% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL003",
+            "heuristica": "desequilibrio_categorias",
+            "status": "LINT",
+            "coluna": "scientific_classification",
+            "ocorrencias": 49640,
+            "amostra": [
+                "no"
+            ],
+            "mensagem": "Categoria dominante detectada: 'no' representa 99.28% dos registros.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL004",
+            "heuristica": "linhas_duplicadas",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhuma linha duplicada encontrada.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL005",
+            "heuristica": "miscoding_caps",
+            "status": "LINT",
+            "coluna": "name",
+            "ocorrencias": 3,
+            "amostra": [
+                "ClinicAll",
+                "Mintbean_Hackathons_JS_Bootcamp_Olympics",
+                "kanban-mintbean-hackathon",
+                "HackMTY2020",
+                "ebb"
+            ],
+            "mensagem": "Possível inconsistência de maiúsculas/minúsculas.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL005",
+            "heuristica": "miscoding_caps",
+            "status": "LINT",
+            "coluna": "default_branch",
+            "ocorrencias": 22,
+            "amostra": [
+                "master",
+                "main",
+                "testing",
+                "develop",
+                "new-master"
+            ],
+            "mensagem": "Possível inconsistência de maiúsculas/minúsculas.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL006",
+            "heuristica": "miscoding_numerico",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhum problema de codificação numérica encontrado.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL007",
+            "heuristica": "outliers",
+            "status": "LINT",
+            "coluna": "id",
+            "ocorrencias": 58,
+            "amostra": [
+                1036816180,
+                1037362618,
+                1037552235,
+                1037514159,
+                1037821253
+            ],
+            "mensagem": "Outliers detectados pelo método IQR. Limites: [38498937.00, 1036646505.00].",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL007",
+            "heuristica": "outliers",
+            "status": "LINT",
+            "coluna": "size",
+            "ocorrencias": 7833,
+            "amostra": [
+                33436,
+                80507,
+                213844,
+                119897,
+                29650
+            ],
+            "mensagem": "Outliers detectados pelo método IQR. Limites: [-9415.50, 16124.50].",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL007",
+            "heuristica": "outliers",
+            "status": "LINT",
+            "coluna": "scientific_probability",
+            "ocorrencias": 3625,
+            "amostra": [
+                0.3211315948046664,
+                0.9578391162584029,
+                0.25956770030958803,
+                0.31833583352430544,
+                0.3434333714753279
+            ],
+            "mensagem": "Outliers detectados pelo método IQR. Limites: [-0.06, 0.23].",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+        },
+        {
+            "codigo": "DL008",
+            "heuristica": "valores_negativos",
+            "status": "OK",
+            "coluna": null,
+            "ocorrencias": 0,
+            "amostra": [],
+            "mensagem": "Nenhum valor negativo encontrado.",
+            "dataset": "dataset",
+            "nome_arquivo": "HackRep.parquet",
+            "caminho": "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
         }
     ]
 }

@@ -1,12 +1,14 @@
 # Data Linter para Qualidade de Dados
 
-Uma proposta de **Data Linter** para validação automatizada de datasets, desenvolvida como Trabalho de Conclusão de Curso (TCC). A ferramenta realiza verificações de qualidade de dados utilizando heurísticas inspiradas no artigo *The Data Linter* (Hynes et al., 2017), integradas a um fluxo automatizado baseado em **Git Hooks**, **Husky**, **Python** e **PySpark**.
+Uma proposta de **Data Linter** para verificação automatizada da qualidade de dados, desenvolvida como Trabalho de Conclusão de Curso (TCC) do curso de Engenharia da Computação da Universidade Federal de Mato Grosso do Sul (UFMS).
+
+A ferramenta realiza verificações automáticas em datasets por meio de heurísticas inspiradas no artigo *The Data Linter: Lightweight, Automated Sanity Checking for ML Data Sets* (Hynes, Sculley e Terry, 2017), integradas a um fluxo automatizado baseado em **Git Hooks**, **Husky**, **Python** e **PySpark**.
 
 ## Objetivo
 
-O objetivo do projeto é identificar automaticamente inconsistências em datasets antes que eles sejam incorporados a pipelines de análise de dados ou aprendizado de máquina.
+O objetivo do projeto é apoiar a identificação precoce de problemas de qualidade em datasets antes de sua utilização em pipelines de análise de dados, engenharia de dados ou aprendizado de máquina.
 
-A ferramenta busca auxiliar na detecção precoce de problemas que podem comprometer a qualidade dos dados, como registros duplicados, valores inconsistentes, desequilíbrio de categorias e outros padrões suspeitos.
+A ferramenta busca detectar automaticamente inconsistências que podem comprometer a confiabilidade dos dados, reduzindo a propagação de problemas para etapas posteriores do fluxo de desenvolvimento.
 
 ## Principais Funcionalidades
 
@@ -16,20 +18,20 @@ A ferramenta busca auxiliar na detecção precoce de problemas que podem comprom
 * Arquitetura modular baseada em heurísticas.
 * Carregamento dinâmico de novas validações.
 * Integração com Git através do Husky.
-* Retornos padronizados das inconsistências encontradas.
+* Retorno padronizado dos resultados das verificações.
 
 ## Heurísticas Implementadas
 
 Atualmente a ferramenta possui as seguintes validações:
 
-* Colunas sem nome
-* Colunas vazias
-* Linhas duplicadas
-* Desequilíbrio de categorias
-* Miscoding numérico
-* Miscoding de capitalização
-* Detecção de outliers (IQR)
-* Valores negativos
+* Colunas sem nome.
+* Colunas vazias.
+* Linhas duplicadas.
+* Desequilíbrio de categorias.
+* Miscoding numérico.
+* Miscoding de capitalização.
+* Detecção de outliers (IQR).
+* Valores negativos.
 
 ## Arquitetura
 
@@ -65,7 +67,6 @@ Relatório de inconsistências
 
 ```text
 ├── data/
-│   ├── datasets CSV e Parquet
 │
 ├── heuristicas/
 │   ├── colunas_sem_nome.py
@@ -88,15 +89,15 @@ Relatório de inconsistências
 
 ## Tecnologias Utilizadas
 
-| Tecnologia | Versão  |
-| ---------- | ------- |
-| Python     | 3.11.9  |
-| PySpark    | 4.1.1   |
-| OpenJDK    | 17.0.18 |
-| Node.js    | 24.14.0 |
-| Husky      | 9.1.7   |
-| Git        | Atual   |
-| VS Code    | Atual   |
+| Tecnologia         | Versão  |
+| ------------------ | ------- |
+| Python             | 3.11.9  |
+| PySpark            | 4.1.1   |
+| OpenJDK            | 17.0.18 |
+| Node.js            | 24.14.0 |
+| Husky              | 9.1.7   |
+| Git                | Atual   |
+| Visual Studio Code | Atual   |
 
 ## Fluxo de Execução
 
@@ -104,69 +105,89 @@ Relatório de inconsistências
 2. São selecionados os datasets e heurísticas desejados.
 3. As configurações são armazenadas em `heuristicas.config.json`.
 4. Durante um commit, o Husky executa automaticamente o hook de pré-commit.
-5. O script `linter_dados.py` é iniciado.
+5. O script principal é iniciado.
 6. O PySpark realiza a leitura dos datasets.
 7. As heurísticas são carregadas dinamicamente.
-8. As inconsistências encontradas são exibidas ao usuário.
-9. Caso sejam detectados problemas, o commit pode ser interrompido.
+8. As verificações são executadas.
+9. Os resultados são apresentados ao usuário.
+10. Caso ocorrências sejam identificadas, o commit pode ser interrompido.
+
+## Resultados Experimentais
+
+A ferramenta foi avaliada utilizando:
+
+* 27 datasets públicos do benchmark MLE-Bench;
+* Dataset HackRep em formato Parquet para validação da compatibilidade com PySpark.
+
+Durante os experimentos foram realizadas:
+
+* 1477 validações;
+* 861 alertas de qualidade identificados;
+* 0 erros de execução.
+
+Os resultados demonstraram a capacidade da ferramenta em identificar automaticamente diferentes tipos de problemas de qualidade em datasets de aprendizado de máquina.
 
 ## Diferenciais da Solução
 
 * Inspirada no conceito de Data Linter para Machine Learning.
 * Integração direta ao fluxo de desenvolvimento.
-* Arquitetura extensível semelhante a plugins.
+* Arquitetura modular e extensível.
 * Compatibilidade com ambientes de Big Data.
 * Suporte a processamento distribuído.
-* Foco em qualidade dos dados.
+* Utilização de PySpark.
+* Suporte aos formatos CSV e Parquet.
 
 ## Trabalhos Relacionados
 
-A ferramenta foi inspirada principalmente pelo artigo:
+A proposta foi inspirada principalmente por:
 
-> HYNES, N.; SCULLEY, D.; TERRY, M. *The Data Linter: Lightweight, Automated Sanity Checking for ML Data Sets*. NeurIPS, 2017.
+* Hynes, N.; Sculley, D.; Terry, M. (2017). *The Data Linter: Lightweight, Automated Sanity Checking for ML Data Sets*.
 
 Além disso, utiliza conceitos de:
 
-* Data Validation for Machine Learning (Breck et al., 2019)
-* Apache Spark (Zaharia et al., 2016)
-* Data Smells (Foidl, Felderer e Ramler, 2022)
+* Breck et al. (2019) – Data Validation for Machine Learning.
+* Zaharia et al. (2016) – Apache Spark.
+* Foidl, Felderer e Ramler (2022) – Data Smells.
 
 ## Status do Projeto
 
-🚧 Em desenvolvimento (TCC)
+✅ Implementação concluída
 
-Etapas concluídas:
+✅ Avaliação experimental concluída
 
-* Arquitetura da ferramenta
-* Implementação das heurísticas
-* Integração com Husky
-* Migração de Pandas para PySpark
-* Suporte a CSV e Parquet
-* Testes iniciais com datasets públicos
+✅ Suporte a CSV e Parquet
 
-Etapas em andamento:
+✅ Integração com Husky
 
-* Consolidação dos resultados experimentais
-* Avaliação em datasets de larga escala
-* Discussão dos resultados
-* Finalização da documentação acadêmica
+✅ Migração para PySpark
+
+🔄 Evoluções futuras:
+
+* Inclusão de novas heurísticas;
+* Geração automática de relatórios;
+* Integração com plataformas de CI/CD;
+* Avaliação em datasets de maior escala.
 
 ## Autor
 
 **Juliano Abi Thomas**
 
 Trabalho de Conclusão de Curso – Engenharia da Computação
+
 Universidade Federal de Mato Grosso do Sul (UFMS)
+
 2026
 
 ## Artigo de Referência
 
-Este trabalho foi inspirado no artigo:
-
 HYNES, N.; SCULLEY, D.; TERRY, M.
-The Data Linter: Lightweight, Automated Sanity Checking for ML Data Sets.
-NeurIPS, 2017.
+
+*The Data Linter: Lightweight, Automated Sanity Checking for ML Data Sets.*
+
+Machine Learning Systems Workshop (MLSys), 2017.
+
+http://learningsys.org/nips17/assets/papers/paper_19.pdf
 
 ## Licença
 
-Projeto desenvolvido para fins acadêmicos como Trabalho de Conclusão de Curso (TCC) da Universidade Federal de Mato Grosso do Sul (UFMS).
+Projeto desenvolvido para fins acadêmicos como Trabalho de Conclusão de Curso da Universidade Federal de Mato Grosso do Sul (UFMS).
