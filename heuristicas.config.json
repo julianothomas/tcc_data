@@ -1,15 +1,8 @@
 {
   "arquivos_dados": [
-    "D:\\faculdade\\tcc\\dataset\\HackRep.parquet"
+    "D:\\faculdade\\tcc\\husky\\data\\dados_sem_erros.csv"
   ],
   "heuristicas": [
-    "colunas_sem_nome",
-    "colunas_vazias",
-    "desequilibrio_categorias",
-    "linhas_duplicadas",
-    "miscoding_caps",
-    "miscoding_numerico",
-    "outliers",
-    "valores_negativos"
+    "colunas_sem_nome"
   ]
 }
