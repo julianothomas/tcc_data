@@ -8,7 +8,7 @@ A ferramenta realiza verificações automáticas em datasets por meio de heurís
 
 O objetivo do projeto é apoiar a identificação precoce de problemas de qualidade em datasets antes de sua utilização em pipelines de análise de dados, engenharia de dados ou aprendizado de máquina.
 
-A ferramenta busca detectar automaticamente inconsistências que podem comprometer a confiabilidade dos dados, reduzindo a propagação de problemas para etapas posteriores do fluxo de desenvolvimento. 123
+A ferramenta busca detectar automaticamente inconsistências que podem comprometer a confiabilidade dos dados, reduzindo a propagação de problemas para etapas posteriores do fluxo de desenvolvimento.
 
 ## Principais Funcionalidades
 
